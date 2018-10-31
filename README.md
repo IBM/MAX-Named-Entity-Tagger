@@ -1,4 +1,4 @@
-# IBM Code Model Asset Exchange: Named Entity Tagger
+# IBM Developer Model Asset Exchange: Named Entity Tagger
 
 This repository contains code to instantiate and deploy a named entity recognition model. This model annotates each word or term in a piece of text with a tag representing the entity type, taken from a list of 17 entity tags from the [The Groningen Meaning Bank (GMB) dataset](http://gmb.let.rug.nl/data.php). These tags cover 8 types of named entities: persons, locations, organizations, geo-political entities, artifacts, events, natural objects, time, as well as a tag for 'no entity' (see the [GMB dataset manual page](http://gmb.let.rug.nl/manual.php) for the full entity definitions). The entity types furthermore may be tagged with either a "B-" tag or "I-" tag. A "B-" tag  indicates the first term of a new entity (or only term of a single-term entity), while subsequent terms in an entity will have an "I-" tag. For example, "New York" would be tagged as `["B-GEO", "I-GEO"]` while  "London" would be tagged as `"B-GEO"`.
 
