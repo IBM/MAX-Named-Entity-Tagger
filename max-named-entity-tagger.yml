@@ -1,0 +1,32 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: max-named-entity-tagger
+spec:
+  selector:
+    app: max-named-entity-tagger
+  ports:
+  - port: 5000
+  type: NodePort
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: max-named-entity-tagger
+  labels:
+    app: max-named-entity-tagger
+spec:
+  selector:
+    matchLabels:
+      app: max-named-entity-tagger
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: max-named-entity-tagger
+    spec:
+      containers:
+      - name: max-named-entity-tagger
+        image: codait/max-named-entity-tagger:latest
+        ports:
+        - containerPort: 5000
