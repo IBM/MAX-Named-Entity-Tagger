@@ -35,7 +35,6 @@ as part of the [IBM Code Model Asset Exchange](https://developer.ibm.com/code/ex
 | This repository | [Apache 2.0](https://www.apache.org/licenses/LICENSE-2.0) | [LICENSE](LICENSE) |
 | Model Weights |  [Apache 2.0](https://www.apache.org/licenses/LICENSE-2.0) | [LICENSE](LICENSE) |
 | Model Code (3rd party) | [Apache 2.0](https://www.apache.org/licenses/LICENSE-2.0) | [TensorFlow NER Repo License](https://github.com/guillaumegenthial/sequence_tagging/blob/master/LICENSE.txt) |
-| Test assets | [CC0](https://creativecommons.org/share-your-work/public-domain/cc0/) | [Asset README](assets/README.md) |
 
 ## Pre-requisites:
 
@@ -66,7 +65,7 @@ You can also deploy the model on Kubernetes using the latest docker image on Doc
 On your Kubernetes cluster, run the following commands:
 
 ```
-$ kubectl apply -f https://github.ibm.com/CODAIT/MAX-Named-Entity-Tagger/raw/master/max-named-entity-tagger.yaml
+$ kubectl apply -f https://github.com/IBM/MAX-Named-Entity-Tagger/raw/master/max-named-entity-tagger.yaml
 ```
 
 The model will be available internally at port `5000`, but can also be accessed externally through the `NodePort`.
@@ -85,7 +84,7 @@ The model will be available internally at port `5000`, but can also be accessed 
 Clone this repository locally. In a terminal, run the following command:
 
 ```
-$ git clone https://github.ibm.com/CODAIT/MAX-Named-Entity-Tagger.git
+$ git clone https://github.com/IBM/MAX-Named-Entity-Tagger.git
 ```
 
 Change directory into the repository base folder:
