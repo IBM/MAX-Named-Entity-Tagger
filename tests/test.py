@@ -28,6 +28,21 @@ def test_metadata():
     assert metadata['license'] == 'Apache 2'
 
 
+def test_labels():
+    model_endpoint = 'http://localhost:5000/model/labels'
+
+    r = requests.get(url=model_endpoint)
+    assert r.status_code == 200
+
+    labels = r.json()
+    tags = labels['labels']
+    assert labels['count'] == 17
+    assert tags[0]['name'] == 'O'
+    assert tags[0]['id'] == '0'
+    assert tags[-1]['id'] == '16'
+    assert tags[-1]['name'] == 'I-ORG'
+
+
 def test_response():
     model_endpoint = 'http://localhost:5000/model/predict'
     text = 'John lives in Brussels and works for the EU'
