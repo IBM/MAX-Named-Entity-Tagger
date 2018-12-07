@@ -1,3 +1,5 @@
+from maxfw.model import MAXModelWrapper
+
 import numpy as np
 import re
 import tensorflow as tf
@@ -7,11 +9,13 @@ from tensorflow.python.keras.layers import concatenate
 from tensorflow.python.keras.models import Model
 import logging
 from core.utils import get_processing_word, load_vocab, pad_sequences
-from config import DEFAULT_MODEL_PATH, MODEL_ID
+from config import DEFAULT_MODEL_PATH, MODEL_ID, MODEL_META_DATA as model_meta
 
 logger = logging.getLogger()
 
-class ModelWrapper(object):
+class ModelWrapper(MAXModelWrapper):
+
+    MODEL_META_DATA = model_meta
 
     pat = re.compile(r'(\W+)')
     dim_word = 300              # word embeddings dim
