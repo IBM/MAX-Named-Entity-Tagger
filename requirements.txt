@@ -1,3 +1,2 @@
 h5py
 tensorflow==1.9.0
--e git+https://github.com/IBM/MAX-Framework.git#egg=maxfw
