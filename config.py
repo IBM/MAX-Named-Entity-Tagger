@@ -5,13 +5,6 @@ DEBUG = False
 RESTPLUS_MASK_SWAGGER = False
 
 # Application settings
-
-# API metadata
-API_TITLE = 'Model Asset Exchange Server'
-API_DESC = 'An API for serving models'
-API_VERSION = '0.1'
-
-# default model
 MODEL_NAME = 'Named Entity Recognition'
 MODEL_ID = 'ner_model'
 DEFAULT_MODEL_PATH = 'assets'

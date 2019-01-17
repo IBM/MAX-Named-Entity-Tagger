@@ -11,7 +11,7 @@ def test_swagger():
 
     json = r.json()
     assert 'swagger' in json
-    assert json.get('info') and json.get('info').get('title') == 'Model Asset Exchange Server'
+    assert json.get('info') and json.get('info').get('title') == 'Model Asset Exchange Microservice'
 
 
 def test_metadata():
@@ -26,6 +26,21 @@ def test_metadata():
     assert metadata['name'] == 'Named Entity Recognition'
     assert metadata['description'] == 'Named Entity Recognition model trained on a subset of the Groningen Meaning Bank (GMB) dataset'
     assert metadata['license'] == 'Apache 2'
+
+
+def test_labels():
+    model_endpoint = 'http://localhost:5000/model/labels'
+
+    r = requests.get(url=model_endpoint)
+    assert r.status_code == 200
+
+    labels = r.json()
+    tags = labels['labels']
+    assert labels['count'] == 17
+    assert tags[0]['name'] == 'O'
+    assert tags[0]['id'] == '0'
+    assert tags[-1]['id'] == '16'
+    assert tags[-1]['name'] == 'I-ORG'
 
 
 def test_response():
