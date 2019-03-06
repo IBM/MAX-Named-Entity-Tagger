@@ -11,7 +11,7 @@ def test_swagger():
 
     json = r.json()
     assert 'swagger' in json
-    assert json.get('info') and json.get('info').get('title') == 'Model Asset Exchange Microservice'
+    assert json.get('info') and json.get('info').get('title') == 'MAX Named Entity Tagger'
 
 
 def test_metadata():
@@ -26,6 +26,8 @@ def test_metadata():
     assert metadata['name'] == 'Named Entity Recognition'
     assert metadata['description'] == 'Named Entity Recognition model trained on a subset of the Groningen Meaning Bank (GMB) dataset'
     assert metadata['license'] == 'Apache 2'
+    assert metadata['type'] == 'Natural Language Processing'
+    assert 'max-named-entity-tagger' in metadata['source']
 
 
 def test_labels():
