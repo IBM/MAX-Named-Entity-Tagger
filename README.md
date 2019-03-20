@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.com/IBM/MAX-Named-Entity-Tagger.svg?branch=master)](https://travis-ci.com/IBM/MAX-Named-Entity-Tagger) [![Website Status](https://img.shields.io/website/http/max-named-entity-tagger.max.us-south.containers.appdomain.cloud/swagger.json.svg?label=api+demo)](http://max-named-entity-tagger.max.us-south.containers.appdomain.cloud/)
+[![Build Status](https://travis-ci.org/IBM/MAX-Named-Entity-Tagger.svg?branch=master)](https://travis-ci.org/IBM/MAX-Named-Entity-Tagger) [![Website Status](https://img.shields.io/website/http/max-named-entity-tagger.max.us-south.containers.appdomain.cloud/swagger.json.svg?label=api+demo)](http://max-named-entity-tagger.max.us-south.containers.appdomain.cloud/)
 
 # IBM Developer Model Asset Exchange: Named Entity Tagger
 
