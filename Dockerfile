@@ -1,7 +1,7 @@
-FROM codait/max-base:v1.1.0
+FROM codait/max-base:v1.1.1
 
 # Fill in these with a link to the bucket containing the model and the model file name
-ARG model_bucket=http://max-assets.s3-api.us-geo.objectstorage.softlayer.net/max-named-entity-tagger
+ARG model_bucket=http://max-assets.s3.us.cloud-object-storage.appdomain.cloud/max-named-entity-tagger
 ARG model_file=assets.tar.gz
 
 RUN wget -nv --show-progress --progress=bar:force:noscroll ${model_bucket}/${model_file} --output-document=assets/${model_file}
