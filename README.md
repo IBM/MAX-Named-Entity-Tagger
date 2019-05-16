@@ -7,7 +7,7 @@ This repository contains code to instantiate and deploy a named entity recogniti
 The model consists of a recurrent neural network architecture with a bi-directional LSTM layer applied to character-level embedding vectors, which are combined with pre-trained [GloVe 6B](https://nlp.stanford.edu/projects/glove/) word vector embeddings; finally a second bi-directional LSTM layer is applied to this combined vector representation. The input to the model is a string and the output is a list of terms in the input text (after applying simple tokenization), together with a list of predicted entity tags for each term.
 
 The model is based on Guillaume Genthial's [Named Entity Recognition with TensorFlow model](https://github.com/guillaumegenthial/sequence_tagging), adapted to use the Keras framework. The model was trained on a subset of the GMB dataset version `2.2.0` by the [IBM CODAIT team](http://codait.org). The model files are hosted on
-[IBM Cloud Object Storage](http://max-assets.s3-api.us-geo.objectstorage.softlayer.net/max-named-entity-tagger/assets.tar.gz).
+[IBM Cloud Object Storage](http://max-assets.s3.us.cloud-object-storage.appdomain.cloud/max-named-entity-tagger/assets.tar.gz).
 The code in this repository deploys the model as a web service in a Docker container. This repository was developed
 as part of the [IBM Code Model Asset Exchange](https://developer.ibm.com/code/exchanges/models/).
 
