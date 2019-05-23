@@ -3,8 +3,8 @@ from maxfw.model import MAXModelWrapper
 import numpy as np
 import re
 import tensorflow as tf
-from tensorflow.python.keras.layers import Flatten, Dense, Embedding, Dropout, \
-    Bidirectional, LSTM, Concatenate, Reshape, Lambda, Input, Activation, Masking
+from tensorflow.python.keras.layers import Dense, Embedding, Dropout, \
+    Bidirectional, LSTM, Lambda, Input, Activation, Masking
 from tensorflow.python.keras.layers import concatenate
 from tensorflow.python.keras.models import Model
 import logging
@@ -12,6 +12,7 @@ from core.utils import get_processing_word, load_vocab, pad_sequences
 from config import DEFAULT_MODEL_PATH, MODEL_ID, MODEL_META_DATA as model_meta
 
 logger = logging.getLogger()
+
 
 class ModelWrapper(MAXModelWrapper):
 
@@ -23,7 +24,7 @@ class ModelWrapper(MAXModelWrapper):
     hidden_size_lstm = 300      # lstm on combined word & char embeddings
     hidden_size_char = 100      # lstm on chars
     dropout = 0.5               # not used for inference but required to build network layers
-    
+
     """Model wrapper for TensorFlow models in SavedModel format"""
     def __init__(self, path=DEFAULT_MODEL_PATH, model=MODEL_ID):
         logger.info('Loading model from: {}...'.format(path))
@@ -43,10 +44,10 @@ class ModelWrapper(MAXModelWrapper):
         vocab_tags = load_vocab(path + "/tags.txt")
         vocab_chars = load_vocab(path + "/chars.txt")
         vocab_words = load_vocab(path + "/words.txt")
-        
+
         self.proc_fn = get_processing_word(vocab_words, vocab_chars, lowercase=True, chars=True)
 
-        self.id_to_tag = {idx:v for v, idx in vocab_tags.items()}
+        self.id_to_tag = {idx: v for v, idx in vocab_tags.items()}
         self.n_words = len(vocab_words)
         self.n_char = len(vocab_chars)
         n_tags = len(vocab_tags)
@@ -65,16 +66,17 @@ class ModelWrapper(MAXModelWrapper):
         mask_char = Masking(mask_value=self.pad_tag)(char_emb_output)
         char_emb_output = Embedding(self.n_char, self.dim_char)(mask_char)
         char_emb_output = Dropout(self.dropout)(char_emb_output)
-        fw_LSTM = LSTM(self.hidden_size_char, return_sequences=False)(char_emb_output) 
+        fw_LSTM = LSTM(self.hidden_size_char, return_sequences=False)(char_emb_output)
         bw_LSTM = LSTM(self.hidden_size_char, return_sequences=False, go_backwards=True)(char_emb_output)
         char_emb_output = concatenate([fw_LSTM, bw_LSTM])
         char_emb_output = Dropout(self.dropout)(char_emb_output)
-        char_emb_output = Lambda(lambda x, z: tf.keras.backend.reshape(x, (-1, tf.shape(z)[1], 2 * self.hidden_size_char)), arguments={"z": word_emb_input})(char_emb_output)
+        char_emb_output = Lambda(lambda x, z: tf.keras.backend.reshape(x, (-1, tf.shape(z)[1], 2 * self.hidden_size_char)),
+                                 arguments={"z": word_emb_input})(char_emb_output)
 
         # concatenates word layers and character layers
         x = concatenate([word_emb_output, char_emb_output])
         x = Dropout(self.dropout)(x)
-        x = Bidirectional(LSTM(self.hidden_size_lstm, return_sequences=True))(x)  
+        x = Bidirectional(LSTM(self.hidden_size_lstm, return_sequences=True))(x)
         x = Dropout(self.dropout)(x)
         scores = Dense(self.n_labels)(x)
         softmax = Activation("softmax")(scores)

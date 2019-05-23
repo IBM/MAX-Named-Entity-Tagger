@@ -1,6 +1,7 @@
 import pytest
 import requests
 
+
 def test_swagger():
 
     model_endpoint = 'http://localhost:5000/swagger.json'
@@ -24,7 +25,8 @@ def test_metadata():
     metadata = r.json()
     assert metadata['id'] == 'ner_model'
     assert metadata['name'] == 'Named Entity Recognition'
-    assert metadata['description'] == 'Named Entity Recognition model trained on a subset of the Groningen Meaning Bank (GMB) dataset'
+    assert metadata['description'] == 'Named Entity Recognition model trained on a subset of '\
+        'the Groningen Meaning Bank (GMB) dataset'
     assert metadata['license'] == 'Apache 2'
     assert metadata['type'] == 'Natural Language Processing'
     assert 'max-named-entity-tagger' in metadata['source']
