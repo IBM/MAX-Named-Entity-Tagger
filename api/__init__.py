@@ -1,2 +1,2 @@
-from .metadata import ModelMetadataAPI
-from .predict import ModelPredictAPI, ModelLabelsAPI
+from .metadata import ModelMetadataAPI  # noqa
+from .predict import ModelPredictAPI, ModelLabelsAPI  # noqa
