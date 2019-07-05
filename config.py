@@ -23,7 +23,7 @@ RESTPLUS_MASK_SWAGGER = False
 # Application settings
 API_TITLE = 'MAX Named Entity Tagger'
 API_DESC = 'Locate and tag named entities in text'
-API_VERSION = '1.1.0'
+API_VERSION = '1.2.0'
 
 MODEL_NAME = 'Named Entity Recognition'
 MODEL_ID = 'ner_model'
