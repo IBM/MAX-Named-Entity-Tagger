@@ -1,12 +1,14 @@
 [![Build Status](https://travis-ci.org/IBM/MAX-Named-Entity-Tagger.svg?branch=master)](https://travis-ci.org/IBM/MAX-Named-Entity-Tagger) [![Website Status](https://img.shields.io/website/http/max-named-entity-tagger.max.us-south.containers.appdomain.cloud/swagger.json.svg?label=api+demo)](http://max-named-entity-tagger.max.us-south.containers.appdomain.cloud/)
 
+[<img src="docs/deploy-max-to-ibm-cloud-with-kubernetes-button.png" width="400px">](http://ibm.biz/max-to-ibm-cloud-tutorial)
+
 # IBM Developer Model Asset Exchange: Named Entity Tagger
 
 This repository contains code to instantiate and deploy a named entity recognition model. This model annotates each word or term in a piece of text with a tag representing the entity type, taken from a list of 17 entity tags from the [The Groningen Meaning Bank (GMB) dataset](http://gmb.let.rug.nl/data.php). These tags cover 8 types of named entities: persons, locations, organizations, geo-political entities, artifacts, events, natural objects, time, as well as a tag for 'no entity' (see the [GMB dataset manual page](http://gmb.let.rug.nl/manual.php) for the full entity definitions). The entity types furthermore may be tagged with either a "B-" tag or "I-" tag. A "B-" tag  indicates the first term of a new entity (or only term of a single-term entity), while subsequent terms in an entity will have an "I-" tag. For example, "New York" would be tagged as `["B-GEO", "I-GEO"]` while  "London" would be tagged as `"B-GEO"`.
 
 The model consists of a recurrent neural network architecture with a bi-directional LSTM layer applied to character-level embedding vectors, which are combined with pre-trained [GloVe 6B](https://nlp.stanford.edu/projects/glove/) word vector embeddings; finally a second bi-directional LSTM layer is applied to this combined vector representation. The input to the model is a string and the output is a list of terms in the input text (after applying simple tokenization), together with a list of predicted entity tags for each term.
 
-The model is based on Guillaume Genthial's [Named Entity Recognition with TensorFlow model](https://github.com/guillaumegenthial/sequence_tagging), adapted to use the Keras framework. The model was trained on a subset of the GMB dataset version `2.2.0` by the [IBM CODAIT team](http://codait.org). The model files are hosted on [IBM Cloud Object Storage](https://s3.us-south.cloud-object-storage.appdomain.cloud/max-assets-prod/max-named-entity-tagger/1.0.0/assets.tar.gz). The code in this repository deploys the model as a web service in a Docker container. This repository was developed as part of the [IBM Code Model Asset Exchange](https://developer.ibm.com/code/exchanges/models/).
+The model is based on Guillaume Genthial's [Named Entity Recognition with TensorFlow model](https://github.com/guillaumegenthial/sequence_tagging), adapted to use the Keras framework. The model was trained on a subset of the GMB dataset version `2.2.0` by the [IBM CODAIT team](http://codait.org). The model files are hosted on [IBM Cloud Object Storage](https://s3.us-south.cloud-object-storage.appdomain.cloud/max-assets-prod/max-named-entity-tagger/1.0.0/assets.tar.gz). The code in this repository deploys the model as a web service in a Docker container. This repository was developed as part of the [IBM Code Model Asset Exchange](https://developer.ibm.com/code/exchanges/models/) and the public API is powered by [IBM Cloud](https://ibm.biz/Bdz2XM).
 
 ## Model Metadata
 | Domain | Application | Industry  | Framework | Training Data | Input Data Format |
@@ -66,6 +68,8 @@ $ kubectl apply -f https://github.com/IBM/MAX-Named-Entity-Tagger/raw/master/max
 ```
 
 The model will be available internally at port `5000`, but can also be accessed externally through the `NodePort`.
+
+A more elaborate tutorial on how to deploy this MAX model to production on [IBM Cloud](https://ibm.biz/Bdz2XM) can be found [here](http://ibm.biz/max-to-ibm-cloud-tutorial).
 
 ## Run Locally
 
