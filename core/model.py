@@ -23,7 +23,7 @@ from tensorflow.python.saved_model import tag_constants
 
 import logging
 from core.utils import get_processing_word, load_vocab, pad_sequences
-from config import DEFAULT_MODEL_PATH, MODEL_ID, MODEL_META_DATA as model_meta
+from config import DEFAULT_MODEL_PATH, MODEL_META_DATA as model_meta
 
 logger = logging.getLogger()
 
@@ -35,7 +35,7 @@ class ModelWrapper(MAXModelWrapper):
     pat = re.compile(r'(\W+)')
 
     """Model wrapper for TensorFlow models in SavedModel format"""
-    def __init__(self, path=DEFAULT_MODEL_PATH, model=MODEL_ID):
+    def __init__(self, path=DEFAULT_MODEL_PATH):
         logger.info('Loading model from: {}...'.format(path))
 
         # load assets first to enable model definition
