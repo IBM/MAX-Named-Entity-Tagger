@@ -1,6 +1,6 @@
-## Train the Model with Your Own Data
+# Train the Model with Your Own Data
 
-This document provides instructions to train the model on Watson Machine Learning, an offering of IBM Cloud. The instructions in this document assume that you already have an IBM Cloud account. If not, please create an [IBM Cloud](https://ibm.biz/Bdz2XM) account. 
+This document provides instructions to train the model on Watson Machine Learning, an offering of IBM Cloud. The instructions in this document assume that you already have an IBM Cloud account. If not, please create an [IBM Cloud](https://ibm.biz/Bdz2XM) account.
 
 - [Prepare Data for Training](#prepare-data-for-training)
 - [Train the Model](#train-the-model)
@@ -13,7 +13,7 @@ To prepare your data for training complete the steps listed in [data_preparation
 ## Train the Model
 
 In this document `$MODEL_REPO_HOME_DIR` refers to the cloned MAX model repository directory, e.g.
-`/users/hi_there/MAX-Object-Detector`. 
+`/users/hi_there/MAX-Named-Entity-Tagger`.
 
 ### Install Local Prerequisites
 
@@ -23,8 +23,9 @@ Open a terminal window, change dir into `$MODEL_REPO_HOME_DIR/training` and inst
    $ cd training/
 
    $ pip install -r requirements.txt
-    ... 
+    ...
    ```
+   
 ### Use Pre Trained Weights
 
 If you wish to perform transfer learning or resume from a previous checkpoint, place the checkpoint files in the `$MODEL_REPO_HOME_DIR/training/sample_training_data/initial_model/` folder. <Any other info about the nature of ckpt files or any specific requirements are listed here>.
@@ -40,22 +41,22 @@ For example:
 
 The `wml_setup.py` script prepares your local environment and your IBM Cloud resources for model training.
 
-1. Locate the training configuration file. It is named `...-training-config.yaml`.
+1. Locate the training configuration file. It is named `max-named-entity-tagger-training-config.yaml`.
 
    ```
 
    $ ls *.yaml
-     <...-training-config.yaml> 
+     max-named-entity-tagger-training-config.yaml
    ```
 
 1. Configure your environment for model training. Run `wml_setup.py` and follow the prompts.
 
    ```
-    $ python wml_setup.py <...-training-config.yaml> 
+    $ python wml_setup.py max-named-entity-tagger-training-config.yaml
      ...
    ```
    
-1. After setup has completed, define the displayed environment variables. These variables provide the model training script with access credentials for your Watson Machine Learning service and Cloud Object Storage service. 
+1. After setup has completed, define the displayed environment variables. These variables provide the model training script with access credentials for your Watson Machine Learning service and Cloud Object Storage service.
 
    MacOS example:
 
@@ -72,10 +73,10 @@ The `wml_setup.py` script prepares your local environment and your IBM Cloud res
 
 ### Train the Model Using Watson Machine Learning
 
-1. Verify that the training preparation steps complete successfully. Replace `<model-name.yaml>` with your configuration file.
+1. Verify that the training preparation steps complete successfully.
 
    ```
-    $ python wml_train.py <...-training-config.yaml> prepare
+    $ python wml_train.py max-named-entity-tagger-training-config.yaml prepare
      ...
      # --------------------------------------------------------
      # Checking environment variables ...
@@ -87,12 +88,12 @@ The `wml_setup.py` script prepares your local environment and your IBM Cloud res
 
     - The required environment variables are defined.
     - Training data is present in the Cloud Object Storage bucket that Watson Machine Learning will access to train the model.
-    - The model training code is packaged in a ZIP file named `<model-name>-model-building-code.zip` that Watson Machine Learning uses to train the model.
+    - The model training code is packaged in a ZIP file named `max-named-entity-tagger-model-building-code.zip` that Watson Machine Learning uses to train the model.
 
 1. Start model training.
 
    ```
-   $ python wml_train.py <...-training-config.yaml> package
+   $ python wml_train.py max-named-entity-tagger-training-config.yaml package
     ...
     # --------------------------------------------------------
     # Starting model training ...
@@ -101,7 +102,7 @@ The `wml_setup.py` script prepares your local environment and your IBM Cloud res
     Training run name     : train-max-...
     Training data bucket  : ...
     Results bucket        : ...
-    Model-building archive: max-...-model-building-code.zip
+    Model-building archive: max-named-entity-tagger-model-building-code.zip
     Model training was started. Training id: model-...
     ...
    ```
@@ -116,7 +117,7 @@ The `wml_setup.py` script prepares your local environment and your IBM Cloud res
    ppppprrrrrrr...
    ```
 
-   > Training continues should your training script get disconnected (e.g. because you terminated the script or lost network connectivity). You can resume monitoring by running `python wml_train.py <...-training-config.yaml> package <training-id>`.
+   > Training continues should your training script get disconnected (e.g. because you terminated the script or lost network connectivity). You can resume monitoring by running `python wml_train.py max-named-entity-tagger-training-config.yaml package <training-id>`.
 
    After training has completed the training log file `training-log.txt` is downloaded along with the trained model artifacts.
 
@@ -140,19 +141,19 @@ The `wml_setup.py` script prepares your local environment and your IBM Cloud res
    $ ls training_output/
      model_training_output.tar.gz
      trained_model/
-     training-log.txt 
+     training-log.txt
    ```
 
 1. Return to the parent directory
 
 ### Rebuild the Model-Serving Microservice
 
-The model-serving microservice out of the box serves the pre-trained model which was trained on [insert_standard_dataset_here](dataset_URL). To serve the model trained on your dataset you have to rebuild the Docker image:
+The model-serving microservice out of the box serves the pre-trained model which was trained on [Groningen Meaning Bank - Modified](https://developer.ibm.com/exchanges/data/all/gmb-modified/). To serve the model trained on your dataset you have to rebuild the Docker image:
 
 1. [Build the Docker image](https://docs.docker.com/engine/reference/commandline/build/):
 
    ```
-   $ docker build -t <max-model-name> --build-arg use_pre_trained_model=false . 
+   $ docker build -t max-named-entity-tagger --build-arg use_pre_trained_model=false .
     ...
    ```
    
@@ -161,6 +162,6 @@ The model-serving microservice out of the box serves the pre-trained model which
 1. Once the Docker image build completes start the microservice by [running the container](https://docs.docker.com/engine/reference/commandline/run/):
  
  ```
- $ docker run -it -p 5000:5000 <max-model-name>
+ $ docker run -it -p 5000:5000 max-named-entity-tagger
  ...
  ```
