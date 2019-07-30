@@ -407,13 +407,8 @@ if cos_env_check_flag == 'N' or wml_env_check_flag == 'N':  # noqa
         print(selection)
         while True:
             option = input("[PROMPT] Your selection:  ")
-            if option == '':
-                print("[MESSAGE] Enter a number 1 or 2.")
-                continue
-            elif not option.isdigit():
-                print("[MESSAGE] Enter a number 1 or 2.")
-                continue
-            elif int(option) < 1 or int(option) > 2:
+            if not option.isdigit() or int(
+                    option) < 1 or int(option) > 2:
                 print("[MESSAGE] Enter a number 1 or 2.")
                 continue
             else:
@@ -440,13 +435,8 @@ if cos_env_check_flag == 'N' or wml_env_check_flag == 'N':  # noqa
         print(selection)
         while True:
             option = input("[PROMPT] Your selection:  ")
-            if option == '':
-                print("[MESSAGE] Enter a number 1 or 2.")
-                continue
-            elif not option.isdigit():
-                print("[MESSAGE] Enter a number 1 or 2.")
-                continue
-            elif int(option) < 1 or int(option) > 2:
+            if not option.isdigit() or int(
+                    option) < 1 or int(option) > 2:
                 print("[MESSAGE] Enter a number 1 or 2.")
                 continue
             else:
@@ -474,13 +464,8 @@ if cos_env_check_flag == 'N' or wml_env_check_flag == 'N':  # noqa
         print(selection)
         while True:
             option = input("[PROMPT] Your selection:  ")
-            if option == '':
-                print("[MESSAGE] Enter a number between 1 and 3.")
-                continue
-            elif not option.isdigit():
-                print("[MESSAGE] Enter a number between 1 and 3.")
-                continue
-            if int(option) < 1 or int(option) > 4:
+            if not option.isdigit() or int(
+                    option) < 1 or int(option) > 3:
                 print("[MESSAGE] Enter a number between 1 and 3.")
                 continue
             else:

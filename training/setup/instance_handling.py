@@ -17,7 +17,7 @@
 import requests
 
 
-class MainHandler():
+class MainHandler:
 
     def __init__(self, resource_id, iam_access_token, ins_obj, ins_handle):
 
@@ -34,7 +34,7 @@ class MainHandler():
         self.resource_id = resource_id
         self.iam_access_token = iam_access_token
 
-    def wml_block(self): # noqa
+    def wml_block(self):  # noqa
         """
         Handles Watson Machine Learning related operations.
         1. Get all WML available instances.
@@ -124,7 +124,8 @@ class MainHandler():
             # Get existing keys and their guid.
             existing_keys, key_option, existing_key_guid = \
                 self.ins_handle.wml_key_check(
-                    existing_guids[int(instance_option) - 1])
+                    existing_guids[int(instance_option) - 1],
+                    self.resource_id, 'wml')
             if existing_keys[int(key_option) - 1] == 'Create New Key':
                 print('-------------------------------------------------'
                       '-----------------------------')
@@ -176,7 +177,7 @@ class MainHandler():
                                        "Storage guid corresponding to the"
                                        " credentials name")
 
-    def cos_block(self): # noqa
+    def cos_block(self):  # noqa
         """
         Handles Cloud Object Storage related operations.
         1. Get all COS available instances.
@@ -257,7 +258,8 @@ class MainHandler():
             # Get existing keys and their guid.
             existing_keys, key_option, existing_key_guid = \
                 self.ins_handle.cos_key_check(
-                    existing_guids[int(instance_option) - 1])
+                    existing_guids[int(instance_option) - 1],
+                    self.resource_id, 'cos')
             if existing_keys[int(key_option) - 1] == 'Create New Key':
                 print('------------------------------------------------'
                       '------------------------------')
