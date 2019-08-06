@@ -21,15 +21,15 @@ args = parser.parse_args()
 data_dir = args.data_path.rstrip('/')
 result_dir = args.model_path.rstrip('/')
 
-train_filename = "{}/train.txt".format(data_dir)
-valid_filename = "{}/valid.txt".format(data_dir)
+train_filename = "{}/data/train.txt".format(data_dir)
+valid_filename = "{}/data/valid.txt".format(data_dir)
 
 use_chars = True
 max_iter = None
 
-vocab_tags = load_vocab("assets/tags.txt")
-vocab_chars = load_vocab("assets/chars.txt")
-vocab_words = load_vocab("assets/words.txt")
+vocab_tags = load_vocab("{}/assets/tags.txt".format(data_dir))
+vocab_chars = load_vocab("{}/assets/chars.txt".format(data_dir))
+vocab_words = load_vocab("{}/assets/words.txt".format(data_dir))
 
 n_words = len(vocab_words)
 n_char = len(vocab_chars)
@@ -44,7 +44,7 @@ train = CoNLLDataset(train_filename, get_processing_word(vocab_words, vocab_char
 valid = CoNLLDataset(valid_filename, get_processing_word(vocab_words, vocab_chars, lowercase=True, chars=use_chars),
                   get_processing_word(vocab_tags, lowercase=False, allow_unk=False), max_iter)
 
-emb_data = np.load("{}/glove.6B.300d.trimmed.npz".format(data_dir))
+emb_data = np.load("{}/assets/glove.6B.300d.trimmed.npz".format(data_dir))
 embeddings = emb_data["embeddings"]
 
 ### Hyperparameters
