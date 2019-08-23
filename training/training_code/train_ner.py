@@ -18,12 +18,14 @@ import argparse
 import os
 import numpy as np
 import tensorflow as tf
-from tensorflow.python.keras.layers import Flatten, Dense, Embedding, Dropout, Bidirectional, LSTM, Concatenate, Reshape, Lambda, Input, Activation, Masking
+from tensorflow.python.keras.layers import Flatten, Dense, Embedding, Dropout, \
+    Bidirectional, LSTM, Concatenate, Reshape, Lambda, Input, Activation, Masking
 from tensorflow.python.keras.layers import concatenate
 from tensorflow.python.keras.models import Model
 from tensorflow.python.keras.optimizers import Adam
 
-from data_utils import get_trimmed_glove_vectors, load_vocab, get_processing_word, CoNLLDataset, get_trimmed_glove_vectors, minibatches, get_chunks, pad_sequences
+from data_utils import get_trimmed_glove_vectors, load_vocab, write_vocab, get_processing_word, \
+    CoNLLDataset, get_trimmed_glove_vectors, minibatches, get_chunks, pad_sequences
 
 os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 
@@ -43,6 +45,7 @@ valid_filename = "{}/data/valid.txt".format(data_dir)
 use_chars = True
 max_iter = None
 
+print('Loading vocab files and word vectors from {}'.format(data_dir))
 vocab_tags = load_vocab("{}/assets/tags.txt".format(data_dir))
 vocab_chars = load_vocab("{}/assets/chars.txt".format(data_dir))
 vocab_words = load_vocab("{}/assets/words.txt".format(data_dir))
@@ -158,17 +161,19 @@ def _build_model(embedding_weights, char_bidirectional=False, concat_bidirection
     return model
 
 # === Build model ===
- 
+
 model = _build_model(embeddings)
 # Optimizer: Adam shows best results
 adam_op = Adam(lr=lr, decay=lr_decay)
 model.compile(optimizer=adam_op, loss='categorical_crossentropy', metrics=['accuracy'])
 
 # train model
+print('Beginning model fitting...')
 model.fit([word_ids_arr, char_ids_arr], labels_arr_one_hot, batch_size=batch_size, epochs=nepochs,
           validation_data=([word_ids_arr_valid, char_ids_arr_valid], labels_arr_one_hot_valid))
 
 # Export keras model to TF SavedModel format
+print('Exporting SavedModel to {}'.format(result_dir))
 model.trainable = False
 with tf.keras.backend.get_session() as sess:
     tf.saved_model.simple_save(
@@ -176,3 +181,11 @@ with tf.keras.backend.get_session() as sess:
         result_dir,
         inputs={t.name:t for t in model.inputs},
         outputs={t.name:t for t in model.outputs})
+        
+# export vocabs
+print('Writing vocab files to {}'.format(result_dir))
+write_vocab(vocab_words, '{}/words.txt'.format(result_dir))
+write_vocab(vocab_chars, '{}/chars.txt'.format(result_dir))
+write_vocab(vocab_tags, '{}/tags.txt'.format(result_dir))
+
+print('Completed training!')
