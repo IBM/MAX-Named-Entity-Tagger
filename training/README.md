@@ -10,10 +10,11 @@ This document provides instructions to train the model on Watson Machine Learnin
 
 To prepare your data for training complete the steps listed in [data_preparation/README.md](data_preparation/README.md).
 
+If you wish to quickly test out model training, you can use the sample data in the `sample_training_data` directory, which is the default data source directory when [running the setup script](#run-the-setup-script) below.
+
 ## Train the Model
 
-In this document `$MODEL_REPO_HOME_DIR` refers to the cloned MAX model repository directory, e.g.
-`/users/hi_there/MAX-Named-Entity-Tagger`.
+In this document `$MODEL_REPO_HOME_DIR` refers to the cloned MAX model repository directory, e.g. `/users/hi_there/MAX-Named-Entity-Tagger`.
 
 ### Install Local Prerequisites
 
@@ -25,17 +26,10 @@ Open a terminal window, change dir into `$MODEL_REPO_HOME_DIR/training` and inst
    $ pip install -r requirements.txt
     ...
    ```
-   
-### Use Pre Trained Weights
-
-If you wish to perform transfer learning or resume from a previous checkpoint, place the checkpoint files in the `$MODEL_REPO_HOME_DIR/training/sample_training_data/initial_model/` folder. <Any other info about the nature of ckpt files or any specific requirements are listed here>.
 
 ### Customize Model Specific Parameters
-<Any model specific changes which the user can make go here>
-For example: 
->If you wish to change training hyper-parameters like `num_iterations`, `learning_rate` etc, pass the 
->corresponding arguments to `$MODEL_REPO_HOME_DIR/training/training_code/training_command.sh`. Look for `#TODO`s on the file >which will guide you. You can also change the backbone/model type to either `full` (which uses the `xception_65` >architecture) or the faster `mobile`(which uses a `mobilenet_v2` architecture). 
 
+If you wish to change training hyper-parameters like `epochs`, update the [training command script](https://github.com/IBM/MAX-Named-Entity-Tagger/blob/training/training/training_code/train-max-model.sh#L100).
 
 ### Run the Setup Script
 
@@ -148,7 +142,7 @@ The `wml_setup.py` script prepares your local environment and your IBM Cloud res
 
 ### Rebuild the Model-Serving Microservice
 
-The model-serving microservice out of the box serves the pre-trained model which was trained on [Groningen Meaning Bank - Modified](https://developer.ibm.com/exchanges/data/all/gmb-modified/). To serve the model trained on your dataset you have to rebuild the Docker image:
+The model-serving microservice out of the box serves the pre-trained model which was trained on [Groningen Meaning Bank - Modified](https://github.com/IBM/MAX-Named-Entity-Tagger#ibm-developer-model-asset-exchange-named-entity-tagger). To serve the model trained on your dataset you have to rebuild the Docker image:
 
 1. [Build the Docker image](https://docs.docker.com/engine/reference/commandline/build/):
 
