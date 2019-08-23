@@ -1,10 +1,10 @@
 # Sample training data
 
-This directory contains two small sample training files to quickly test out model training: `train.txt` and `valid.txt`. For the purposes of testing, the contents of both files are identical.
+This directory contains two small sample training files to quickly test out model training: `train.txt` and `valid.txt`. For this purpose, the contents of both files are identical.
 
-The sample file is taken from the [TensorFlow sequence tagging repo](https://github.com/guillaumegenthial/sequence_tagging/blob/master/data/test.txt) under the [LICENSE](https://github.com/guillaumegenthial/sequence_tagging/blob/master/LICENSE.txt) of the repo - [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0.txt).
+The sample data file is taken from the [TensorFlow sequence tagging repo](https://github.com/guillaumegenthial/sequence_tagging/blob/master/data/test.txt) under the [Apache License 2.0](https://github.com/guillaumegenthial/sequence_tagging/blob/master/LICENSE.txt).
 
-Also provided are the ancillary assets required for training:
+Also provided in the `assets` sub-directory are the ancillary files required for training:
 
 * `chars.txt` - vocabulary of characters in sample data files
 * `tags.txt` - vocabulary of entity tags present in sample data files
