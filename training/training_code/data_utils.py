@@ -1,3 +1,5 @@
+# Adapted from https://github.com/guillaumegenthial/sequence_tagging/blob/master/model/data_utils.py
+
 import numpy as np
 import os
 

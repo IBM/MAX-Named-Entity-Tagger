@@ -96,11 +96,8 @@ echo "# ************************************************************"
 echo "# Training model ..."
 echo "# ************************************************************"
 
-# IBM TODO: Specify the training command; the cwd contains the files from 
-#           the training_code directory
-# Example: "python3 train-dcgan.py --dataset ${DATA_DIR}/aligned --epoch 20"
 # start training and capture return code
-TRAINING_CMD="python3 train-ner.py --data_path ${DATA_DIR}/data --model_path ${RESULT_DIR}/model/saved_model --epochs 30"
+TRAINING_CMD="python3 train_ner.py --data_path ${DATA_DIR}/data --model_path ${RESULT_DIR}/model/saved_model --epochs 30"
 
 # display training command
 echo "Running training command \"$TRAINING_CMD\""

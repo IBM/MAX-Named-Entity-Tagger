@@ -1,3 +1,5 @@
+# Adapted from https://github.com/guillaumegenthial/sequence_tagging/blob/master/build_data.py
+
 import argparse
 from data_utils import CoNLLDataset, get_vocabs, UNK, NUM, \
     get_glove_vocab, write_vocab, load_vocab, get_char_vocab, \
