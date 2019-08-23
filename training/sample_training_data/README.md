@@ -1,6 +1,6 @@
 # Sample training data
 
-This directory contains two small sample training files to quickly test out model training: `train.txt` and `valid.txt`. For this purpose, the contents of both files are identical.
+This directory contains two small sample training files in the `data` sub-directory, in order to quickly test out model training: `train.txt` and `valid.txt`. For this purpose, the contents of both files are identical.
 
 The sample data file is taken from the [TensorFlow sequence tagging repo](https://github.com/guillaumegenthial/sequence_tagging/blob/master/data/test.txt) under the [Apache License 2.0](https://github.com/guillaumegenthial/sequence_tagging/blob/master/LICENSE.txt).
 
