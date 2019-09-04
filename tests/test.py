@@ -39,8 +39,8 @@ def test_metadata():
     assert r.status_code == 200
 
     metadata = r.json()
-    assert metadata['id'] == 'ner_model'
-    assert metadata['name'] == 'Named Entity Recognition'
+    assert metadata['id'] == 'max-named-entity-tagger'
+    assert metadata['name'] == 'MAX Named Entity Tagger'
     assert metadata['description'] == 'Named Entity Recognition model trained on a subset of '\
         'the Groningen Meaning Bank (GMB) dataset'
     assert metadata['license'] == 'Apache 2'
