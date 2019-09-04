@@ -30,9 +30,9 @@ MODEL_LICENSE = 'Apache 2'
 
 MODEL_META_DATA = {
     'id': '{}'.format(API_TITLE.lower().replace(' ', '-')),
-    'name': '{}'.format(API_TITLE),
+    'name': API_TITLE,
     'description': 'Named Entity Recognition model trained on a subset of the Groningen Meaning Bank (GMB) dataset',
     'type': 'Natural Language Processing',
-    'license': '{}'.format(MODEL_LICENSE),
+    'license': MODEL_LICENSE,
     'source': 'https://developer.ibm.com/exchanges/models/all/max-named-entity-tagger/'
 }
