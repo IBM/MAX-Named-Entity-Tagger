@@ -79,8 +79,6 @@ echo "Training data is stored in $DATA_DIR"
 echo "Training work files and results will be stored in $RESULT_DIR"
 
 # Install prerequisite packages
-# IBM TODO: add required packages to the file 
-# 
 echo "Installing prerequisite packages ..."
 pip install -r training_requirements.txt
 
@@ -117,11 +115,7 @@ fi
 echo "Training completed. Output is stored in $RESULT_DIR."
 
 # ---------------------------------------------------------------
-# IBM TODO:
-# Add post processing code as necessary; for example
-#  - patch the TensorFlow checkpoint file (if applicable)
-#  - convert the trained model into other formats
-#  - ... 
+# Apply post-processing of model artifacts
 # ---------------------------------------------------------------
 
 echo "# ************************************************************"
@@ -153,11 +147,6 @@ if [ -d ${RESULT_DIR}/model/checkpoint ]; then
   fi    
 fi  
 
-#
-# TODO: add custom code if required; e.g. to convert the
-#       trained model into other formats ...
-#
-
 # ---------------------------------------------------------------
 # Prepare for packaging
 # (1) create the staging directory structure
@@ -176,13 +165,6 @@ TRAINING_STAGING_DIR=${BASE_STAGING_DIR}/trained_model
 mkdir -p $TRAINING_STAGING_DIR
 
 # TensorFlow-specific directories
-# IBM TODO: 
-#   1) Identify the serialization format that the model-serving Docker image uses
-#   2) Uncomment the appropriate variable assignment 
-#   3) Do NOT change the directory name
-#   4) Remove the TODO comment
-#MODEL_ARTIFACT_TARGET_PATH=${TRAINING_STAGING_DIR}/tensorflow/checkpoint
-#MODEL_ARTIFACT_TARGET_PATH=${TRAINING_STAGING_DIR}/tensorflow/frozen_graph_def
 MODEL_ARTIFACT_TARGET_PATH=${TRAINING_STAGING_DIR}/tensorflow/saved_model
 if [ -z ${MODEL_ARTIFACT_TARGET_PATH+x} ];
   then "Error. This script was not correctly customized."
@@ -192,35 +174,9 @@ mkdir -p $MODEL_ARTIFACT_TARGET_PATH
 
 #
 # 2. copy trained model artifacts to $MODEL_ARTIFACT_TARGET_PATH
-# IBM TODO: 
-#   1) Add commands that copy the model training artifacts from 
-#   ${RESULT_DIR}/model/... to $MODEL_ARTIFACT_TARGET_PATH
-#   2) Remove the TODO comment
-# Example for tensorflow checkpoint files:
-#if [ -d ${RESULT_DIR}/model/checkpoint ]; then
-#  cp -R ${RESULT_DIR}/model/checkpoint ${TRAINING_STAGING_DIR}/tensorflow/
-#fi
-# Example for tensorflow frozen graph files:
-#if [ -d ${RESULT_DIR}/model/frozen_graph_def ]; then
-#  cp -R ${RESULT_DIR}/model/frozen_graph_def ${TRAINING_STAGING_DIR}/tensorflow/
-#fi
-# Example for tensorflow saved_model files:
 if [ -d ${RESULT_DIR}/model/saved_model ]; then
  cp -R ${RESULT_DIR}/model/saved_model ${TRAINING_STAGING_DIR}/tensorflow/
 fi
-
-# The following files should now be present in BASE_STAGING_DIR
-#   trained_model/<framework-name>/<serialization-format>/file1
-#   trained_model/<framework-name>/<serialization-format>subdirectory/file2
-#   trained_model/<framework-name>/<serialization-format-2>file3
-#   trained_model/<framework-name-2>/<serialization-format>file4
-#   ...
-# Example:
-#   trained_model/tensorflow/checkpoint/checkpoint
-#   trained_model/tensorflow/checkpoint/DCGAN.model-21.meta
-#   trained_model/tensorflow/checkpoint/DCGAN.model-21.index
-#   trained_model/tensorflow/checkpoint/DCGAN.model-21.data-00000-of-00001
-#   trained_model/tensorflow/frozen_graph_def/frozen_inference_graph.pb
 
 # ----------------------------------------------------------------------
 # Create a compressed TAR archive containing files from $BASE_STAGING_DIR
@@ -252,12 +208,3 @@ rm -rf $BASE_STAGING_DIR
 
 echo "Model training and packaging completed."
 exit $SUCCESS_RETURN_CODE
-
-#
-# Expected result:
-#  - $OUTPUT_ARCHIVE contains
-#     trained_model/<framework-name>/<serialization-format>/file1
-#     trained_model/<framework-name>/<serialization-format>subdirectory/file2
-#     trained_model/<framework-name>/<serialization-format-2>file3
-#     trained_model/<framework-name-2>/<serialization-format>file4
-#     ...
