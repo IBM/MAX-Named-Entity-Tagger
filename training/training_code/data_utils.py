@@ -1,8 +1,5 @@
 # Adapted from https://github.com/guillaumegenthial/sequence_tagging/blob/master/model/data_utils.py
-
 import numpy as np
-import os
-
 
 # shared global variables to be imported from model also
 UNK = "$UNK$"
@@ -44,7 +41,6 @@ class CoNLLDataset(object):
         self.max_iter = max_iter
         self.length = None
 
-
     def __iter__(self):
         niter = 0
         with open(self.filename) as f:
@@ -60,14 +56,13 @@ class CoNLLDataset(object):
                         words, tags = [], []
                 else:
                     ls = line.split(' ')
-                    word, tag = ls[0],ls[-1]
+                    word, tag = ls[0], ls[-1]
                     if self.processing_word is not None:
                         word = self.processing_word(word)
                     if self.processing_tag is not None:
                         tag = self.processing_tag(tag)
                     words += [word]
                     tags += [tag]
-
 
     def __len__(self):
         """Iterates once over the corpus to set and store length"""
@@ -212,7 +207,7 @@ def get_trimmed_glove_vectors(filename):
 
 
 def get_processing_word(vocab_words=None, vocab_chars=None,
-                    lowercase=False, chars=False, allow_unk=True):
+                        lowercase=False, chars=False, allow_unk=True):
     """Return lambda function that transform a word (string) into list,
     or tuple of (list, id) of int corresponding to the ids of the word and
     its corresponding characters.
@@ -227,7 +222,7 @@ def get_processing_word(vocab_words=None, vocab_chars=None,
     """
     def f(word):
         # 0. get chars of words
-        if vocab_chars is not None and chars == True:
+        if vocab_chars is not None:
             char_ids = []
             for char in word:
                 # ignore chars out of vocabulary
@@ -248,11 +243,10 @@ def get_processing_word(vocab_words=None, vocab_chars=None,
                 if allow_unk:
                     word = vocab_words[UNK]
                 else:
-                    raise Exception("Unknown key is not allowed. Check that "\
-                                    "your vocab (tags?) is correct")
+                    raise Exception("Unknown key is not allowed. Check that your vocab (tags?) is correct")
 
         # 3. return tuple char ids, word id
-        if vocab_chars is not None and chars == True:
+        if vocab_chars is not None and chars:
             return char_ids, word
         else:
             return word
@@ -274,7 +268,7 @@ def _pad_sequences(sequences, pad_tok, max_length):
     for seq in sequences:
         seq = list(seq)
         seq_ = seq[:max_length] + [pad_tok]*max(max_length - len(seq), 0)
-        sequence_padded +=  [seq_]
+        sequence_padded += [seq_]
         sequence_length += [min(len(seq), max_length)]
 
     return sequence_padded, sequence_length
@@ -292,9 +286,9 @@ def pad_sequences(sequences, pad_tok, nlevels=1):
 
     """
     if nlevels == 1:
-        max_length = max(map(lambda x : len(x), sequences))
+        max_length = max(map(lambda x: len(x), sequences))
         sequence_padded, sequence_length = _pad_sequences(sequences,
-                                            pad_tok, max_length)
+                                                          pad_tok, max_length)
 
     elif nlevels == 2:
         max_length_word = max([max(map(lambda x: len(x), seq))
@@ -306,11 +300,11 @@ def pad_sequences(sequences, pad_tok, nlevels=1):
             sequence_padded += [sp]
             sequence_length += [sl]
 
-        max_length_sentence = max(map(lambda x : len(x), sequences))
+        max_length_sentence = max(map(lambda x: len(x), sequences))
         sequence_padded, _ = _pad_sequences(sequence_padded,
-                [pad_tok]*max_length_word, max_length_sentence)
+                                            [pad_tok]*max_length_word, max_length_sentence)
         sequence_length, _ = _pad_sequences(sequence_length, 0,
-                max_length_sentence)
+                                            max_length_sentence)
 
     return sequence_padded, sequence_length
 

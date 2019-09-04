@@ -34,7 +34,7 @@ chars_filename = "{}/chars.txt".format(output_dir)
 processing_word = get_processing_word(lowercase=True)
 
 train = CoNLLDataset(train_filename, processing_word)
-valid  = CoNLLDataset(valid_filename, processing_word)
+valid = CoNLLDataset(valid_filename, processing_word)
 
 # Build word and tag vocabs
 vocab_words, vocab_tags = get_vocabs([train, valid])
@@ -50,8 +50,7 @@ write_vocab(vocab_tags, tags_filename)
 
 # Trim GloVe Vectors
 vocab = load_vocab(words_filename)
-export_trimmed_glove_vectors(vocab, glove_filename,
-                            filename_trimmed, dim_word)
+export_trimmed_glove_vectors(vocab, glove_filename, filename_trimmed, dim_word)
 
 # Build and save char vocab
 train = CoNLLDataset(train_filename)
