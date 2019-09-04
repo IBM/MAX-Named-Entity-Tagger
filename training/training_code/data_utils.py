@@ -18,7 +18,7 @@ class CoNLLDataset(object):
         tags: list of raw tags
 
     If processing_word and processing_tag are not None,
-    optional preprocessing is appplied
+    optional preprocessing is applied
 
     Example:
         ```python
@@ -248,7 +248,7 @@ def get_processing_word(vocab_words=None, vocab_chars=None,
                 if allow_unk:
                     word = vocab_words[UNK]
                 else:
-                    raise Exception("Unknow key is not allowed. Check that "\
+                    raise Exception("Unknown key is not allowed. Check that "\
                                     "your vocab (tags?) is correct")
 
         # 3. return tuple char ids, word id

@@ -52,7 +52,7 @@ The `wml_setup.py` script prepares your local environment and your IBM Cloud res
    
 1. After setup has completed, define the displayed environment variables. These variables provide the model training script with access credentials for your Watson Machine Learning service and Cloud Object Storage service.
 
-   MacOS example:
+   MacOS/Linux example:
 
    ```
    $ export ML_INSTANCE=...
