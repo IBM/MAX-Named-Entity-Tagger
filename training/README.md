@@ -29,7 +29,7 @@ Open a terminal window, change dir into `$MODEL_REPO_HOME_DIR/training` and inst
 
 ### Customize Model Specific Parameters
 
-If you wish to change training hyper-parameters like `epochs`, update the [training command script](https://github.com/IBM/MAX-Named-Entity-Tagger/blob/training/training/training_code/train-max-model.sh#L100).
+If you wish to change training hyper-parameters like `epochs`, update the [training command script](https://github.com/IBM/MAX-Named-Entity-Tagger/blob/training/training/training_code/train-max-model.sh) (look for the line specifying the `TRAINING_CMD` to be executed).
 
 ### Run the Setup Script
 
