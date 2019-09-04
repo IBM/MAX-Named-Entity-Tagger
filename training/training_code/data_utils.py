@@ -18,7 +18,7 @@ class CoNLLDataset(object):
         tags: list of raw tags
 
     If processing_word and processing_tag are not None,
-    optional preprocessing is appplied
+    optional preprocessing is applied
 
     Example:
         ```python
