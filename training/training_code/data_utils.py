@@ -248,7 +248,7 @@ def get_processing_word(vocab_words=None, vocab_chars=None,
                 if allow_unk:
                     word = vocab_words[UNK]
                 else:
-                    raise Exception("Unknow key is not allowed. Check that "\
+                    raise Exception("Unknown key is not allowed. Check that "\
                                     "your vocab (tags?) is correct")
 
         # 3. return tuple char ids, word id
