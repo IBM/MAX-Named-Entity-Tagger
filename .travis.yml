@@ -11,4 +11,4 @@ before_script:
   - flake8 . --max-line-length=127
   - sleep 30
 script:
-  - pytest tests/test.py
+  - pytest tests/
