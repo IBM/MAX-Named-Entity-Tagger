@@ -29,7 +29,7 @@ train:
                   bucket:
                   path:
             training_data_local:
-                  path: sample_training_data
+                  path: sample_training_data/
 
       mount_type: mount_cos
       execution:
