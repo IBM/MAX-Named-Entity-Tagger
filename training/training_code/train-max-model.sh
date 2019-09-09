@@ -96,7 +96,7 @@ echo "# ************************************************************"
 
 # start training and capture return code
 # NOTE - epochs here is set to 10 for simple testing purposes. You likely want to train for more epochs, 30-40
-TRAINING_CMD="python3 train_ner.py --data_path ${DATA_DIR}/data --model_path ${RESULT_DIR}/model/saved_model --epochs 10"
+TRAINING_CMD="python3 train_ner.py --data_path ${DATA_DIR} --model_path ${RESULT_DIR}/model/saved_model --epochs 10"
 
 # display training command
 echo "Running training command \"$TRAINING_CMD\""
