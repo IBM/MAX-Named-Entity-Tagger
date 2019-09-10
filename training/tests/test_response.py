@@ -18,21 +18,21 @@ import pytest
 import requests
 
 
-# def test_labels():
-#     '''Test expected outcome of training run on sample data'''
-#     model_endpoint = 'http://localhost:5000/model/labels'
+def test_labels():
+    '''Test expected outcome of training run on sample data'''
+    model_endpoint = 'http://localhost:5000/model/labels'
 
-#     r = requests.get(url=model_endpoint)
-#     assert r.status_code == 200
+    r = requests.get(url=model_endpoint)
+    assert r.status_code == 200
 
-#     # only expect a subset of the labels to be present
-#     labels = r.json()
-#     tags = labels['labels']
-#     assert labels['count'] == 9
-#     assert tags[0]['name'] == 'B-PER'
-#     assert tags[0]['id'] == '0'
-#     assert tags[-1]['id'] == '8'
-#     assert tags[-1]['name'] == 'B-MISC'
+    # only expect a subset of the labels to be present
+    labels = r.json()
+    tags = labels['labels']
+    assert labels['count'] == 9
+    assert tags[0]['name'] == 'B-PER'
+    assert tags[0]['id'] == '0'
+    assert tags[-1]['id'] == '8'
+    assert tags[-1]['name'] == 'B-MISC'
 
 
 def test_response():

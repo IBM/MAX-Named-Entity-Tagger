@@ -42,6 +42,8 @@ tag_desc = {
     'I-PER': 'Person; entities are limited to individuals that are human or have human characteristics, such as divine entities.',  # noqa
     'B-GEO': 'Location; entities are limited to geographical entities such as geographical areas and landmasses, bodies of water, and geological formations. B- tag indicates start of a new phrase.',  # noqa
     'I-GEO': 'Location; entities are limited to geographical entities such as geographical areas and landmasses, bodies of water, and geological formations.',  # noqa
+    'B-LOC': 'Location; entities are limited to geographical entities such as geographical areas and landmasses, bodies of water, and geological formations. B- tag indicates start of a new phrase.',  # noqa
+    'I-LOC': 'Location; entities are limited to geographical entities such as geographical areas and landmasses, bodies of water, and geological formations.',  # noqa
     'B-ORG': 'Organization; entities are limited to corporations, agencies, and other groups of people defined by an established organizational structure. B- tag indicates start of a new phrase.',  # noqa
     'I-ORG': 'Organization; entities are limited to corporations, agencies, and other groups of people defined by an established organizational structure',  # noqa
     'B-GPE': 'Geo-political Entity; entities are geographical regions defined by political and/or social groups. A GPE entity subsumes and does not distinguish between a city, a nation, its region, its government, or its people. B- tag indicates start of a new phrase.',  # noqa
@@ -65,7 +67,7 @@ class ModelLabelsAPI(MetadataAPI):
     def get(self):
         '''Return the list of labels that can be predicted by the model'''
         result = {}
-        result['labels'] = [{'id': l[0], 'name': l[1], 'description': tag_desc[l[1]]} for l in model_wrapper.id_to_tag.items()]
+        result['labels'] = [{'id': l[0], 'name': l[1], 'description': tag_desc[l[1]] if l[1] in tag_desc else ''} for l in model_wrapper.id_to_tag.items()]
         result['count'] = len(model_wrapper.id_to_tag)
         return result
 
