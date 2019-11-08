@@ -1,20 +1,23 @@
-# Train the Model with Your Own Data
+## Train the Model with Your Own Data
 
-This document provides instructions to train the model on Watson Machine Learning, an offering of IBM Cloud. The instructions in this document assume that you already have an IBM Cloud account. If not, please create an [IBM Cloud](https://ibm.biz/Bdz2XM) account.
+This document provides instructions to train the model on Watson Machine Learning, an offering of IBM Cloud. The instructions in this document assume that you already have an IBM Cloud account. If not, please create an [IBM Cloud](https://ibm.biz/Bdz2XM) account. 
 
 - [Prepare Data for Training](#prepare-data-for-training)
 - [Train the Model](#train-the-model)
-- [Rebuild the Model Serving Microservice](#rebuild-the-model-serving-microservice)
+- [Rebuild the Model-Serving Microservice](#rebuild-the-model-serving-microservice)
 
 ## Prepare Data for Training
 
 To prepare your data for training complete the steps listed in [data_preparation/README.md](data_preparation/README.md).
 
-If you wish to quickly test out model training, you can use the sample data in the `sample_training_data` directory, which is the default data source directory when [running the setup script](#run-the-setup-script) below.
-
 ## Train the Model
 
-In this document `$MODEL_REPO_HOME_DIR` refers to the cloned MAX model repository directory, e.g. `/users/hi_there/MAX-Named-Entity-Tagger`.
+- [Install Local Prerequisites](#install-local-prerequisites)
+- [Run the Setup Script](#run-the-setup-script)
+- [Customize Training](#customize-training)
+- [Train the Model Using Watson Machine Learning](#train-the-model-using-watson-machine-learning)
+
+In this document `$MODEL_REPO_HOME_DIR` refers to the cloned MAX model repository directory, e.g. `/users/gone_fishing/MAX-Named-Entity-Tagger`. 
 
 ### Install Local Prerequisites
 
@@ -24,16 +27,18 @@ Open a terminal window, change dir into `$MODEL_REPO_HOME_DIR/training` and inst
    $ cd training/
 
    $ pip install -r requirements.txt
-    ...
+    ... 
    ```
 
-### Customize Model Specific Parameters
-
-If you wish to change training hyper-parameters like `epochs`, update the [training command script](https://github.com/IBM/MAX-Named-Entity-Tagger/blob/training/training/training_code/train-max-model.sh) (look for the line specifying the `TRAINING_CMD` to be executed).
+The directory contains two Python scripts, `setup_max_model_training` and `train_max_model`, which you'll use to prepare your environment for model training and to perform model training on Watson Machine Learning.
 
 ### Run the Setup Script
 
-The `wml_setup.py` script prepares your local environment and your IBM Cloud resources for model training.
+To perform model training, you need access to a Watson Machine Learning service instance and a Cloud Object Storage service instance on IBM Cloud. The `setup_max_model_training` Python script prepares your IBM Cloud resources for model training and configures your local environment.
+
+#### Steps
+
+1. Open a terminal window.
 
 1. Locate the training configuration file. It is named `max-named-entity-tagger-training-config.yaml`.
 
@@ -43,33 +48,68 @@ The `wml_setup.py` script prepares your local environment and your IBM Cloud res
      max-named-entity-tagger-training-config.yaml
    ```
 
-1. Configure your environment for model training. Run `wml_setup.py` and follow the prompts.
+2. Run `setup_max_model_training` and follow the prompts to configure model training.
 
    ```
-    $ python wml_setup.py max-named-entity-tagger-training-config.yaml
+    $ ./setup_max_model_training max-named-entity-tagger-training-config.yaml
      ...
+     ------------------------------------------------------------------------------
+     Model training setup is complete and your configuration file was updated.
+     ------------------------------------------------------------------------------
+     Training data bucket name   : max-named-entity-tagger-sample-input
+     Local data directory        : sample_training_data/
+     Training results bucket name: max-named-entity-tagger-sample-output
+     Compute configuration       : k80     
    ```
+
+   On Microsoft Windows run `python setup_max_model_training max-named-entity-tagger-training-config.yaml`.
+
+   The setup script updates the training configuration file using the information you've provided. For security reasons, confidential information, such as API keys or passwords, are _not_ stored in this file. Instead the script displays a set of environment variables that you must define to make this information available to the training script.
    
-1. After setup has completed, define the displayed environment variables. These variables provide the model training script with access credentials for your Watson Machine Learning service and Cloud Object Storage service.
+3. Once setup is completed, define the displayed environment variables. The model training script `train_max_model` uses those variables to access your training resources.
 
    MacOS/Linux example:
-
+   
    ```
-   $ export ML_INSTANCE=...
    $ export ML_APIKEY=...
+   $ export ML_INSTANCE=...
    $ export ML_ENV=...
    $ export AWS_ACCESS_KEY_ID=...
    $ export AWS_SECRET_ACCESS_KEY=...
    ```
+
+   Microsoft Windows:
    
-   > The training script `wml_train.py` requires these environment variables. If they are not set, model training cannot be started.
+   ```
+   $ set ML_APIKEY=...
+   $ set ML_INSTANCE=...
+   $ set ML_ENV=...
+   $ set AWS_ACCESS_KEY_ID=...
+   $ set AWS_SECRET_ACCESS_KEY=...
+   ```
+
+   > If you re-run the setup script and select a different Watson Machine Learning service instance or Cloud Object Storage service instance the displayed values will change. The values do not change if you modify any other configuration setting, such as the input data bucket or the compute configuration.
+
+### Prepare Data for Training
+
+You can test the model training process using the sample data in the `sample_training_data` directory. To use your own data, follow the instructions in [data_preparation/README.md](data_preparation/README.md).
+
+### Customize Training
+
+If you wish to change the network architecture or training hyper-parameters like `epochs` etc, change the corresponding arguments in `$MODEL_REPO_HOME_DIR/training/training_code/training-parameters.sh`.
 
 ### Train the Model Using Watson Machine Learning
+
+The `train_max_model` script verifies your configuration settings, packages the model training code, uploads it to Watson Machine Learning, launches the training run, monitors the training run, and downloads the trained model artifacts.
+
+Complete the following steps in the terminal window where the earlier mentioned environment variables are defined. 
+
+#### Steps
 
 1. Verify that the training preparation steps complete successfully.
 
    ```
-    $ python wml_train.py max-named-entity-tagger-training-config.yaml prepare
+    $ ./train_max_model max-named-entity-tagger-training-config.yaml prepare
      ...
      # --------------------------------------------------------
      # Checking environment variables ...
@@ -77,16 +117,17 @@ The `wml_setup.py` script prepares your local environment and your IBM Cloud res
      ...
    ```
 
+   On Microsoft Windows run `python train_max_model max-named-entity-tagger-training-config.yaml prepare`.
+
    If preparation completed successfully:
 
-    - The required environment variables are defined.
-    - Training data is present in the Cloud Object Storage bucket that Watson Machine Learning will access to train the model.
-    - The model training code is packaged in a ZIP file named `max-named-entity-tagger-model-building-code.zip` that Watson Machine Learning uses to train the model.
+    - Training data is present in the Cloud Object Storage bucket that WML will access during model training.
+    - Model training code is packaged `max-named-entity-tagger-model-building-code.zip`
 
 1. Start model training.
 
    ```
-   $ python wml_train.py max-named-entity-tagger-training-config.yaml package
+   $ ./train_max_model max-named-entity-tagger-training-config.yaml package
     ...
     # --------------------------------------------------------
     # Starting model training ...
@@ -99,18 +140,31 @@ The `wml_setup.py` script prepares your local environment and your IBM Cloud res
     Model training was started. Training id: model-...
     ...
    ```
-   
-    > Take note of the training id.
 
-1. Monitor the model training progress.
+   > On Microsoft Windows run `python train_max_model max-named-entity-tagger-training-config.yaml package`.
+
+1. Note the displayed `Training id`. It uniquely identifies your training run in Watson Machine Learning.
+
+1. Monitor training progress.
 
    ```
    ...
-   Training status is updated every 15 seconds - (p)ending (r)unning (e)rror (c)ompleted: 
+   Checking model training status every 15 seconds. Press Ctrl+C once to stop monitoring or  press Ctrl+C twice to cancel training.
+   Status - (p)ending (r)unning (e)rror (c)ompleted or canceled:
    ppppprrrrrrr...
    ```
 
-   > Training continues should your training script get disconnected (e.g. because you terminated the script or lost network connectivity). You can resume monitoring by running `python wml_train.py max-named-entity-tagger-training-config.yaml package <training-id>`.
+   To **stop** monitoring (but continue model training), press `Ctrl+C` once.
+ 
+   To **restart** monitoring, run the following command, replacing `<training-id>` with the id that was displayed when you started model training. 
+   
+      ```
+      ./train_max_model max-named-entity-tagger-training-config.yaml package <training-id>
+      ```
+
+    > On Microsoft Windows run `python ./train_max_model max-named-entity-tagger-training-config.yaml package <training-id>`
+  
+   To **cancel** the training run, press `Ctrl+C` twice.
 
    After training has completed the training log file `training-log.txt` is downloaded along with the trained model artifacts.
 
@@ -128,33 +182,36 @@ The `wml_setup.py` script prepares your local environment and your IBM Cloud res
    ....................................................................................
    ```
 
-   > If training was terminated early due to an error only the log file is downloaded. Inspect it to identify the problem.
+   If training was terminated early due to an error only the log file is downloaded. Inspect it to identify the problem.
 
    ```
    $ ls training_output/
      model_training_output.tar.gz
      trained_model/
-     training-log.txt
+     training-log.txt 
    ```
 
-1. Return to the parent directory
-
-### Rebuild the Model-Serving Microservice
-
-The model-serving microservice out of the box serves the pre-trained model which was trained on [Groningen Meaning Bank - Modified](https://github.com/IBM/MAX-Named-Entity-Tagger#ibm-developer-model-asset-exchange-named-entity-tagger). To serve the model trained on your dataset you have to rebuild the Docker image:
-
-1. [Build the Docker image](https://docs.docker.com/engine/reference/commandline/build/):
+4. Return to the parent directory `$MODEL_REPO_HOME_DIR`.
 
    ```
-   $ docker build -t max-named-entity-tagger --build-arg use_pre_trained_model=false .
+   $ cd ..
+   ```
+
+## Rebuild the Model-Serving Microservice
+
+The model-serving microservice out of the box serves the pre-trained model which was trained on [Groningen Meaning Bank - Modified](https://gmb.let.rug.nl/data.php). To serve the model trained on your dataset you have to rebuild the Docker image:
+
+1. Rebuild the Docker image. In `$MODEL_REPO_HOME_DIR` run
+
+   ```
+   $ docker build -t max-named-entity-tagger --build-arg use_pre_trained_model=false . 
     ...
    ```
    
    > If the optional parameter `use_pre_trained_model` is set to `true` or if the parameter is not defined the Docker image will be configured to serve the pre-trained model.
    
-1. Once the Docker image build completes start the microservice by [running the container](https://docs.docker.com/engine/reference/commandline/run/):
+ 2. Run the customized Docker image.
  
- ```
- $ docker run -it -p 5000:5000 max-named-entity-tagger
- ...
- ```
+    ```
+    $ docker run -it -p 5000:5000 max-named-entity-tagger
+    ```
