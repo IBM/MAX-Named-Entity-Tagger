@@ -1,19 +1,3 @@
-#
-# Copyright 2018-2019 IBM Corp. All Rights Reserved.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-#
-
 import argparse
 import os
 import numpy as np
@@ -23,9 +7,12 @@ from tensorflow.python.keras.layers import Dense, Embedding, Dropout, \
 from tensorflow.python.keras.layers import concatenate
 from tensorflow.python.keras.models import Model
 from tensorflow.python.keras.optimizers import Adam
-
+from tensorflow.python.keras.callbacks import ModelCheckpoint
+from f1 import F1Score
+import sys
 from data_utils import load_vocab, write_vocab, get_processing_word, \
     CoNLLDataset, minibatches, pad_sequences
+import shutil
 
 os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 
@@ -63,28 +50,32 @@ train = CoNLLDataset(train_filename, get_processing_word(vocab_words, vocab_char
 valid = CoNLLDataset(valid_filename, get_processing_word(vocab_words, vocab_chars, lowercase=True, chars=use_chars),
                      get_processing_word(vocab_tags, lowercase=False, allow_unk=False), max_iter)
 
-emb_data = np.load("{}/assets/glove.6B.300d.trimmed.npz".format(data_dir))
+emb_data = np.load("{}/assets/glove.6B.100d.trimmed.npz".format(data_dir))
 embeddings = emb_data["embeddings"]
 
 # Hyperparameters
-dim_word = 300
-dim_char = 100
-hidden_size_char = 100  # lstm on chars
-hidden_size_lstm = 300  # lstm on word embeddings
+dim_word = 100
+dim_char = 32
+hidden_size_char = 64  # lstm on chars
+hidden_size_lstm = 128  # lstm on word embeddings
 nepochs = args.epochs
-lr = 0.0105
-lr_decay = 0.0005
-batch_size = 10
-dropout = 0.5
+lr = 0.0015
+lr_decay = 0.95
+batch_size = 32
+dropout = 0.15
 
 # Process training dataset
 print('Creating training dataset...')
 words, labels = list(minibatches(train, len(train)))[0]  # NOTE: len(train) will return entire dataset!
 char_ids, word_ids = zip(*words)
+
 word_ids, sequence_lengths = pad_sequences(word_ids, pad_tok=pad_tag)
 char_ids, word_lengths = pad_sequences(char_ids, pad_tok=pad_tag, nlevels=2)
 labels, _ = pad_sequences(labels, pad_tok=pad_tag)
 
+
+print('......here is char_ids lenght')
+print(len(char_ids))
 # Convert word and char ids to np arrays; one-hot encode labels
 char_ids_arr = np.array(char_ids)
 word_ids_arr = np.array(word_ids)
@@ -105,9 +96,9 @@ word_ids_arr_valid = np.array(word_ids_valid)
 labels_arr_valid = np.array(labels_valid)
 labels_arr_one_hot_valid = np.eye(n_labels)[labels_arr_valid]
 
+
+
 # === Model code ===
-
-
 def _build_embeddings(weights, use_bidirectional=False):
     # The first 'branch' of the model embeds words.
     word_emb_input = Input((None, ), name='word_input')
@@ -166,14 +157,32 @@ def _build_model(embedding_weights, char_bidirectional=False, concat_bidirection
 
 # === Build model ===
 
+num_classes = len(labels_arr_one_hot)
+f1 = F1Score(num_classes,average='micro')
+
 model = _build_model(embeddings)
 # Optimizer: Adam shows best results
 adam_op = Adam(lr=lr, decay=lr_decay)
-model.compile(optimizer=adam_op, loss='categorical_crossentropy', metrics=['accuracy'])
+model.compile(optimizer=adam_op, loss='categorical_crossentropy', metrics=['accuracy', f1])
+
+
+# Remove training output folder before saving the model files of the current run
+shutil.rmtree('training_output', ignore_errors=True)
+
+model_filename = "Epoch-{epoch:02d}"
+checkpoint_path = os.path.join('training_output/checkpoints/', model_filename)
+
+
+callbacks = ModelCheckpoint(filepath=checkpoint_path,
+                            period=1,
+                            verbose=1,
+                            save_weights_only=True,
+                            )
+
 
 # train model
 print('Beginning model fitting...')
-model.fit([word_ids_arr, char_ids_arr], labels_arr_one_hot, batch_size=batch_size, epochs=nepochs,
+model.fit([word_ids_arr, char_ids_arr], labels_arr_one_hot, batch_size=batch_size, callbacks=[callbacks], epochs=nepochs,
           validation_data=([word_ids_arr_valid, char_ids_arr_valid], labels_arr_one_hot_valid))
 
 # Export keras model to TF SavedModel format
