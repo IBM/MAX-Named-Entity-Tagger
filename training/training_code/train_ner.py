@@ -1,3 +1,19 @@
+#
+# Copyright 2018-2019 IBM Corp. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
 import argparse
 import os
 import numpy as np
@@ -50,19 +66,19 @@ train = CoNLLDataset(train_filename, get_processing_word(vocab_words, vocab_char
 valid = CoNLLDataset(valid_filename, get_processing_word(vocab_words, vocab_chars, lowercase=True, chars=use_chars),
                      get_processing_word(vocab_tags, lowercase=False, allow_unk=False), max_iter)
 
-emb_data = np.load("{}/assets/glove.6B.100d.trimmed.npz".format(data_dir))
+emb_data = np.load("{}/assets/glove.6B.300d.trimmed.npz".format(data_dir))
 embeddings = emb_data["embeddings"]
 
 # Hyperparameters
-dim_word = 100
-dim_char = 32
-hidden_size_char = 64  # lstm on chars
-hidden_size_lstm = 128  # lstm on word embeddings
+dim_word = 300
+dim_char = 100
+hidden_size_char = 100  # lstm on chars
+hidden_size_lstm = 300  # lstm on word embeddings
 nepochs = args.epochs
-lr = 0.0015
-lr_decay = 0.95
-batch_size = 32
-dropout = 0.15
+lr = 0.0105
+lr_decay = 0.0005
+batch_size = 10
+dropout = 0.5
 
 # Process training dataset
 print('Creating training dataset...')
@@ -74,8 +90,6 @@ char_ids, word_lengths = pad_sequences(char_ids, pad_tok=pad_tag, nlevels=2)
 labels, _ = pad_sequences(labels, pad_tok=pad_tag)
 
 
-print('......here is char_ids lenght')
-print(len(char_ids))
 # Convert word and char ids to np arrays; one-hot encode labels
 char_ids_arr = np.array(char_ids)
 word_ids_arr = np.array(word_ids)
