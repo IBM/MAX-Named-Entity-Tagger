@@ -75,12 +75,12 @@ class ModelLabelsAPI(MetadataAPI):
 # === Predict API
 
 
-input_example = 'John lives in Brussels and works for the EU'
+input_example = ['John lives in Brussels and works for the EU']
 ent_example = ['I-PER', 'O', 'O', 'I-LOC', 'O', 'O', 'O', 'O', 'I-ORG']
 term_example = ['John', 'lives', 'in', 'Brussels', 'and', 'works', 'for', 'the', 'EU']
 
 model_input = MAX_API.model('ModelInput', {
-    'text': fields.String(required=True, description='Text for which to predict entities', example=input_example)
+    'text': fields.List(fields.String, required=True, description='List containing text for which to predict entities', example=input_example)
 })
 
 model_prediction = MAX_API.model('ModelPrediction', {

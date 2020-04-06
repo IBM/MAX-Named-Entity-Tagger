@@ -177,8 +177,14 @@ callbacks = ModelCheckpoint(filepath=checkpoint_path,
                             period=1,
                             verbose=1,
                             save_weights_only=True,
-                            )
+                           )
 
+'''
+# Load latest checkpoints and restart training
+latest = tf.train.latest_checkpoint('training_output/checkpoints/')
+print('The latest checkpoint is:', latest)
+model.load_weights(latest)
+'''
 
 # train model
 print('Beginning model fitting...')
