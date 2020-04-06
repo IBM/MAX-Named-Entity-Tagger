@@ -25,7 +25,6 @@ from tensorflow.python.keras.models import Model
 from tensorflow.python.keras.optimizers import Adam
 from tensorflow.python.keras.callbacks import ModelCheckpoint
 from f1 import F1Score
-import sys
 from data_utils import load_vocab, write_vocab, get_processing_word, \
     CoNLLDataset, minibatches, pad_sequences
 import shutil
@@ -111,7 +110,6 @@ labels_arr_valid = np.array(labels_valid)
 labels_arr_one_hot_valid = np.eye(n_labels)[labels_arr_valid]
 
 
-
 # === Model code ===
 def _build_embeddings(weights, use_bidirectional=False):
     # The first 'branch' of the model embeds words.
@@ -172,7 +170,7 @@ def _build_model(embedding_weights, char_bidirectional=False, concat_bidirection
 # === Build model ===
 
 num_classes = len(labels_arr_one_hot)
-f1 = F1Score(num_classes,average='micro')
+f1 = F1Score(num_classes, average='micro')
 
 model = _build_model(embeddings)
 # Optimizer: Adam shows best results
@@ -191,7 +189,7 @@ callbacks = ModelCheckpoint(filepath=checkpoint_path,
                             period=1,
                             verbose=1,
                             save_weights_only=True,
-                           )
+                            )
 
 '''
 # Load latest checkpoints and restart training
