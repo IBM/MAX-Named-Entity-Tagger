@@ -26,7 +26,7 @@ def test_labels():
 
     labels = r.json()
     tags = labels['labels']
-    assert labels['count'] == 17
+    assert labels['count'] == 18
     assert tags[0]['name'] == 'O'
     assert tags[0]['id'] == '0'
     assert tags[-1]['id'] == '16'
@@ -39,8 +39,8 @@ def test_response():
     test_json = {
         "text": text
     }
-    expected_tags = ["B-PER", "O", "O", "B-GEO", "O", "O", "O", "O", "B-ORG"]
-    expected_terms = ["John", "lives", "in", "Brussels", "and", "works", "for", "the", "EU"]
+    expected_tags = [["B-PER", "O", "O", "B-GEO", "O", "O", "O", "O", "B-ORG"]]
+    expected_terms = [["John", "lives", "in", "Brussels", "and", "works", "for", "the", "EU"]]
 
     r = requests.post(url=model_endpoint, json=test_json)
 

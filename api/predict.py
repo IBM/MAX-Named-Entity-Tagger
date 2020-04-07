@@ -86,9 +86,9 @@ model_input = MAX_API.model('ModelInput', {
 })
 
 model_prediction = MAX_API.model('ModelPrediction', {
-    'tags': fields.List(fields.String, required=True, description='List of predicted entity tags, one per term in the input text.',  # noqa
+    'tags': fields.List(fields.List(fields.String), required=True, description='List of predicted entity tags, one per term in the input text.',  # noqa
                         example=ent_example),
-    'terms': fields.List(fields.String, required=True,
+    'terms': fields.List(fields.List(fields.String), required=True,
                          description='Terms extracted from input text pre-processing. Each term has a corresponding predicted entity tag in the "tags" field.',  # noqa
                          example=term_example)
 })
