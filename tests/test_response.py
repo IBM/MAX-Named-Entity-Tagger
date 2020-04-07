@@ -35,7 +35,7 @@ def test_labels():
 
 def test_response():
     model_endpoint = 'http://localhost:5000/model/predict'
-    text = 'John lives in Brussels and works for the EU'
+    text = ['John lives in Brussels and works for the EU']
     test_json = {
         "text": text
     }
