@@ -29,8 +29,8 @@ def test_labels():
     assert labels['count'] == 18
     assert tags[0]['name'] == 'O'
     assert tags[0]['id'] == '0'
-    assert tags[-1]['id'] == '16'
-    assert tags[-1]['name'] == 'I-ORG'
+    assert tags[-2]['id'] == '16'
+    assert tags[-2]['name'] == 'I-ORG'
 
 
 def test_response():
