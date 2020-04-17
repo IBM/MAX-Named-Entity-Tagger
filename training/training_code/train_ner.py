@@ -18,12 +18,12 @@ import argparse
 import os
 import numpy as np
 import tensorflow as tf
-from tensorflow.python.keras.layers import Dense, Embedding, Dropout, \
+from tensorflow.keras.layers import Dense, Embedding, Dropout, \
     Bidirectional, LSTM, Lambda, Input, Activation, Masking
-from tensorflow.python.keras.layers import concatenate
-from tensorflow.python.keras.models import Model
-from tensorflow.python.keras.optimizers import Adam
-from tensorflow.python.keras.callbacks import ModelCheckpoint
+from tensorflow.keras.layers import concatenate
+from tensorflow.keras.models import Model
+from tensorflow.keras.optimizers import Adam
+from tensorflow.keras.callbacks import ModelCheckpoint
 from f1 import F1Score
 from data_utils import load_vocab, write_vocab, get_processing_word, \
     CoNLLDataset, minibatches, pad_sequences
@@ -175,7 +175,7 @@ f1 = F1Score(num_classes, average='micro')
 model = _build_model(embeddings)
 # Optimizer: Adam shows best results
 adam_op = Adam(lr=lr, decay=lr_decay)
-model.compile(optimizer=adam_op, loss='categorical_crossentropy', metrics=['accuracy', f1])
+model.compile(optimizer=adam_op, loss='categorical_crossentropy', metrics=['accuracy', f1], experimental_run_tf_function=False)
 
 
 # Remove training output folder before saving the model files of the current run
@@ -206,8 +206,8 @@ model.fit([word_ids_arr, char_ids_arr], labels_arr_one_hot, batch_size=batch_siz
 # Export keras model to TF SavedModel format
 print('Exporting SavedModel to {}'.format(result_dir))
 model.trainable = False
-with tf.keras.backend.get_session() as sess:
-    tf.saved_model.simple_save(
+with tf.compat.v1.keras.backend.get_session() as sess:
+    tf.compat.v1.saved_model.simple_save(
         sess,
         result_dir,
         inputs={t.name: t for t in model.inputs},
