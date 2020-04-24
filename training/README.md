@@ -17,7 +17,7 @@ To prepare your data for training complete the steps listed in [data_preparation
 - [Customize Training](#customize-training)
 - [Train the Model Using Watson Machine Learning](#train-the-model-using-watson-machine-learning)
 
-In this document `$MODEL_REPO_HOME_DIR` refers to the cloned MAX model repository directory, e.g. `/users/gone_fishing/MAX-Named-Entity-Tagger`. 
+In this document `$MODEL_REPO_HOME_DIR` refers to the cloned MAX model repository directory, e.g. `/users/gone_fishing/MAX-Named-Entity-Tagger`.
 
 ### Install Local Prerequisites
 
@@ -94,7 +94,7 @@ You can test the model training process using the sample data in the `sample_tra
 
 ### Customize Training
 
-If you wish to change the network architecture or training hyper-parameters like `epochs` etc, change the corresponding arguments in `$MODEL_REPO_HOME_DIR/training/training_code/training-parameters.sh`.
+If you wish to change the network architecture or training hyper-parameters like `epochs` etc, change the corresponding configuration parameters in `$MODEL_REPO_HOME_DIR/training/training_code/params.py`.
 
 ### Train the Model Using Watson Machine Learning
 
@@ -196,7 +196,7 @@ The model-serving microservice out of the box serves the pre-trained model which
 1. Rebuild the Docker image. In `$MODEL_REPO_HOME_DIR` run
 
    ```
-   $ docker build -t max-named-entity-tagger --build-arg use_pre_trained_model=false . 
+   $ docker build -t max-named-entity-tagger --build-arg use_pre_trained_model=false .
     ...
    ```
    
