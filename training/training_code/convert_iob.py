@@ -8,7 +8,7 @@ def out_file(path, name, wt):
     return '{}/{}.{}.txt'.format(path, name, wt)
 
 
-def process_iob(filename):
+def convert_iob(filename, delimiter):
     with open(filename) as f:
         sentences = []
         tags = []
@@ -20,8 +20,6 @@ def process_iob(filename):
                     continue
                 elif len(line) == 0:
                     if len(words) > 0 and len(word_tags) > 0:
-                        # if 'Wilma' in words:
-                            # print(words)
                         sentences += [words]
                         tags += [word_tags]
                         words, word_tags = [], []
@@ -36,7 +34,7 @@ def process_iob(filename):
 
 def write_output(data, out_file):
     with open(out_file, 'w') as f:
-        writer = csv.writer(f, delimiter=' ', quoting=csv.QUOTE_NONE, escapechar='\\')
+        writer = csv.writer(f, delimiter=delimiter, quoting=csv.QUOTE_NONE, escapechar='\\')
         writer.writerows(data)
     print('Wrote {}'.format(out_file))
 
@@ -46,6 +44,7 @@ parser = argparse.ArgumentParser(description=
 parser.add_argument('--data_path', required=True,
     help='path to training data in IOB format')
 parser.add_argument('--output_path', required=True, help='path to write output data')
+parser.add_argument('--delimiter', default='\t', help='delimiter to write output data (default: TAB)')
 parser.add_argument('--files', required=False, type=str, default='train,valid,test',
     help='comma-delimited list of filenames to process - .txt extensions are assumed (default: train, valid, test)')
 
@@ -53,6 +52,7 @@ args = parser.parse_args()
 
 data_dir = args.data_path.rstrip('/')
 output_dir = args.output_path.rstrip('/')
+delimiter = args.delimiter
 Path(output_dir).mkdir(exist_ok=True)
 files = args.files
 files = files.split(',')
@@ -60,6 +60,6 @@ files = files.split(',')
 for f in files:
     fname = '{}/{}.txt'.format(data_dir, f)
     print('Processing file: {}'.format(fname))
-    sentences, tags = process_iob(fname)
+    sentences, tags = convert_iob(fname, delimiter)
     write_output(sentences, out_file(output_dir, f, 'words'))
     write_output(tags, out_file(output_dir, f, 'tags'))
