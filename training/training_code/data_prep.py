@@ -13,6 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+# Adapted from https://github.com/guillaumegenthial/tf_ner/blob/master/data/example/build_vocab.py
+# and https://github.com/guillaumegenthial/tf_ner/blob/master/data/example/build_glove.py
 
 import argparse
 from collections import Counter
@@ -45,6 +47,7 @@ min_count = args.min_count
 # 1. Words
 # Get Counter of words on all the data, filter by min count, save
 
+Path(output_dir).mkdir(exist_ok=True)
 # we build the vocab only on training data
 print('Building word vocab (may take a while)')
 train_file = '{}/train.words.txt'.format(data_dir)
