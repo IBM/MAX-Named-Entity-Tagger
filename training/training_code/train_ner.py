@@ -25,7 +25,6 @@ import pandas as pd
 import tensorflow as tf
 import tensorflow_addons as tfa
 import tensorflow_text as text
-from tensorflow.python.ops import lookup_ops
 
 from metrics import compute_cm, metrics_from_confusion_matrix
 
@@ -72,6 +71,22 @@ def create_dataset(fwords, ftags, params, vocab_words, vocab_chars, vocab_tags, 
     if shuffle:
         dataset = dataset.shuffle(buffer)
     return dataset.prefetch(prefetch)
+
+
+def _get_vocab(path, num_oov_buckets):
+    tfi = tf.lookup.TextFileInitializer(path,
+        tf.string, tf.lookup.TextFileIndex.WHOLE_LINE,
+        tf.int64, tf.lookup.TextFileIndex.LINE_NUMBER)
+    if num_oov_buckets:
+        return tf.lookup.StaticVocabularyTable(tfi, num_oov_buckets)
+    else:
+        return tf.lookup.StaticHashTable(tfi, -1)
+
+def _get_reverse_vocab(path, default_value='O'):
+    tfi = tf.lookup.TextFileInitializer(path,
+        tf.int64, tf.lookup.TextFileIndex.LINE_NUMBER,
+        tf.string, tf.lookup.TextFileIndex.WHOLE_LINE)
+    return tf.lookup.StaticHashTable(tfi, default_value)
 
 
 def _build_model(num_words, num_chars, num_tags, params):
@@ -142,6 +157,7 @@ def train(ner_model, params, train_data, valid_data):
 
     x_sig = train_data.element_spec[0]
     y_sig = train_data.element_spec[1]
+
     # === set up optimizer and metrics ===
     optimizer = tf.keras.optimizers.Adam()
     acc = tf.keras.metrics.Accuracy()
@@ -189,9 +205,6 @@ def train(ner_model, params, train_data, valid_data):
         val_acc(y, pred_ids, sample_weight=mask)
         # f1
         return pred_ids, mask
-
-    # reverse_words = lookup_ops.index_to_string_table_from_file(params['words'])
-    # reverse_tags = ner_model.reverse_vocab_tags
 
     epochs = params['epochs']
     checkpoint_interval = params.get('checkpoint_interval', 5)
@@ -262,8 +275,9 @@ def generate_mc_metrics(params, ner_model, dataset):
     golds = []
     preds = []
 
-    reverse_words = lookup_ops.index_to_string_table_from_file(params['words'])
-    reverse_tags = lookup_ops.index_to_string_table_from_file(params['tags'], default_value='O')
+    reverse_words = _get_reverse_vocab(params['words'], default_value='UNK')
+    reverse_tags = _get_reverse_vocab(params['tags'], default_value='O')
+    
     for x, y in dataset:
         pred_ids, sent_lengths = test_predict_step(x)
         word_batch = reverse_words.lookup(x['word_ids'])
@@ -346,13 +360,10 @@ class NERModel(tf.keras.Model):
 
     @staticmethod
     def _load_vocabs(params):
-        vocab_words = lookup_ops.index_table_from_file(
-            params['words'], num_oov_buckets=params['num_oov_buckets'])
-        vocab_chars = lookup_ops.index_table_from_file(
-            params['chars'], num_oov_buckets=params['num_oov_buckets'])
-        vocab_tags = lookup_ops.index_table_from_file(params['tags'])
-        reverse_vocab_tags = lookup_ops.index_to_string_table_from_file(
-            params['tags'])
+        vocab_words = _get_vocab(params['words'], params['num_oov_buckets'])
+        vocab_chars = _get_vocab(params['chars'], params['num_oov_buckets'])
+        vocab_tags = _get_vocab(params['tags'], 0)
+        reverse_vocab_tags = _get_reverse_vocab(params['tags'])
         return vocab_words, vocab_chars, vocab_tags, reverse_vocab_tags
 
     @tf.function(input_signature=[tf.TensorSpec((None,), dtype=tf.string)])
