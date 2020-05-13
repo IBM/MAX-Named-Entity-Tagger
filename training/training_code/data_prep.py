@@ -23,6 +23,15 @@ import numpy as np
 
 
 def data_prep(data_dir, glove_dir, output_dir, dim_word, glove_type, lower_case, min_count):
+    print('''Running data_prep with:
+    data_dir: {}
+    glove_dir: {}
+    output_dir: {}
+    dim_word: {}
+    glove_type: {}
+    lower_case: {}
+    min_count: {}
+    '''.format(data_dir, glove_dir, output_dir, dim_word, glove_type, lower_case, min_count))
     # 1. Words
     # Get Counter of words on all the data, filter by min count, save
 
@@ -130,9 +139,11 @@ if __name__ == '__main__':
     parser.add_argument('--dim', type=int, default=100, help='dimension of GloVe word embedding vectors (default: 100)')
     parser.add_argument('--min_count', type=int, default=1, help='drop words < min_count occurence in the vocabulary (default: 1)')
     parser.add_argument('--glove_type', default='6B', help='Corpus for GloVe embeddings: 6B or 840B (default 6B)')
-    parser.add_argument('--lower_case', type=bool, default=True,
-        help='If True, word vocab is generated for lowercase words only (chars are still cased). ' + 
-        'This MUST be matched with same setting in training script (default: True)')
+    parser.add_argument('--glove_cased', dest='lower_case', action='store_false',
+        help='''set this flag if glove word embeddings should be cased (default: uncased).
+        If ommitted, the word vocab is generated for lowercase words only (chars are still cased).
+        This MUST be matched with same setting in training script''')
+    parser.set_defaults(lower_case=True)
 
     args = parser.parse_args()
     data_dir = args.data_path.rstrip('/')

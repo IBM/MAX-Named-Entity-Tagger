@@ -523,33 +523,57 @@ if __name__ == '__main__':
     import argparse
 
     parser = argparse.ArgumentParser(description='Train the Char Embedding Bi-LSTM Named Entity Recognition model')
-    parser.add_argument('--data_path', required=True,
+    # options for file paths/names
+    path_group = parser.add_argument_group('File name and path options')
+    path_group.add_argument('--data_path', required=True,
         help='path to training data. Assumes assets in "assets/" folder and data in "data/" folder')
-    parser.add_argument('--result_path', required=True, help='path where results and model output will be saved')
-    parser.add_argument('--dim_words', type=int, default=100, help='word embedding dimension')
-    parser.add_argument('--dim_chars', type=int, default=32, help='character embedding dimension')
-    parser.add_argument('--dropout', type=float, default=0.5, help='dropout rate')
-    parser.add_argument('--num_oov_buckets', type=int, default=1, help='out-of-vocabulary buckets for lookup tables')
-    parser.add_argument('--epochs', type=int, default=20, help='number of epochs to train')
-    parser.add_argument('--conf_epochs', type=int, default=0,
+    path_group.add_argument('--result_path', required=True, help='path where results and model output will be saved')
+    path_group.add_argument('--words', default='vocab.words.txt', help='filename for words vocab')
+    path_group.add_argument('--chars', default='vocab.chars.txt', help='filename for character vocab')
+    path_group.add_argument('--tags', default='vocab.tags.txt', help='filename for tags vocab')
+    path_group.add_argument('--glove', default='glove.npz', help='filename for glove embeddings npz file')
+    path_group.add_argument('--export_dir', default='saved_model', help='filename for glove embeddings npz file')
+    # options for if data needs to be prepared
+    prep_group = parser.add_argument_group('Data preparation options')
+    prep_group.add_argument('--raw_glove_path', required=False,
+        help='''path to raw glove vectors. If this option is specified, the data preparation script will be run first 
+        in order to generate the trimmed glove embeddings and vocabularies. 
+        This assumes that the input data is in the "data/" folder and the vocabs and embeddings will be 
+        written to "assets/" folder''')
+    prep_group.add_argument('--min_count', type=int, default=1, help='drop words < min_count occurence in the vocabulary (default: 1)')
+    prep_group.add_argument('--glove_type', default='6B', help='Corpus for GloVe embeddings: 6B or 840B (default 6B)')
+    # model options
+    model_group = parser.add_argument_group('Model definition and training options')
+    model_group.add_argument('--dim_words', type=int, default=100, help='word embedding dimension')
+    model_group.add_argument('--dim_chars', type=int, default=32, help='character embedding dimension')
+    model_group.add_argument('--dropout', type=float, default=0.5, help='dropout rate')
+    model_group.add_argument('--num_oov_buckets', type=int, default=1, help='out-of-vocabulary buckets for lookup tables')
+    model_group.add_argument('--epochs', type=int, default=20, help='number of epochs to train')
+    model_group.add_argument('--conf_epochs', type=int, default=0,
         help='number of epochs to train confidence branch after training main network (default: 0 i.e. no confidence branch training)')
-    parser.add_argument('--checkpoint_interval', type=int, default=5, help='checkpoint interval in epochs')
-    parser.add_argument('--batch_size', type=int, default=32, help='batch size')
-    parser.add_argument('--buffer', type=int, default=2000, help='buffer for training dataset shuffle')
-    parser.add_argument('--char_lstm_size', type=int, default=64, help='hidden size for char bi-lstm layer')
-    parser.add_argument('--lstm_size', type=int, default=128, help='hidden size for concatenated bi-lstm layer')
-    parser.add_argument('--words', default='vocab.words.txt', help='filename for words vocab')
-    parser.add_argument('--chars', default='vocab.chars.txt', help='filename for character vocab')
-    parser.add_argument('--tags', default='vocab.tags.txt', help='filename for tags vocab')
-    parser.add_argument('--glove', default='glove.npz', help='filename for glove embeddings npz file')
-    parser.add_argument('--lower_case', type=bool, default=True, help='checkpoint interval in epochs')
-    parser.add_argument('--export_dir', default='saved_model', help='filename for glove embeddings npz file')
+    model_group.add_argument('--checkpoint_interval', type=int, default=5, help='checkpoint interval in epochs')
+    model_group.add_argument('--batch_size', type=int, default=32, help='batch size')
+    model_group.add_argument('--buffer', type=int, default=2000, help='buffer for training dataset shuffle')
+    model_group.add_argument('--char_lstm_size', type=int, default=64, help='hidden size for char bi-lstm layer')
+    model_group.add_argument('--lstm_size', type=int, default=128, help='hidden size for concatenated bi-lstm layer')
+    model_group.add_argument('--glove_cased', dest='lower_case', action='store_false',
+        help='set this flag if glove word embeddings should be cased (default: uncased)')
+    model_group.set_defaults(lower_case=True)
 
     args = parser.parse_args()
-    ASSET_DIR = Path(args.data_path, 'assets')
-    DATA_DIR = Path(args.data_path, 'data')
+    
+    data_path = args.data_path
+    ASSET_DIR = Path(data_path, 'assets')
+    DATA_DIR = Path(data_path, 'data')
     RESULT_DIR = Path(args.result_path)
     params = vars(args).copy()
+
+    if params['raw_glove_path']:
+        print('Option --raw_glove_path specified. Running data preparation script.')
+        # first we prepare the dataset 
+        from data_prep import data_prep      
+        data_prep(DATA_DIR, Path(params['raw_glove_path']), ASSET_DIR, params['dim_words'],
+            params['glove_type'], params['lower_case'], params['min_count'])
 
     # Logging
     Path(RESULT_DIR).mkdir(exist_ok=True)
