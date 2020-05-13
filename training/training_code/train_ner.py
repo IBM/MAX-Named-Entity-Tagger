@@ -463,7 +463,7 @@ class NERModel(tf.keras.Model):
             tokens = tf.ragged.map_flat_values(tf.strings.lower, tokens)
         sent_lengths = tokens.row_lengths()
         word_ids = self.vocab_words.lookup(tokens.to_tensor(self.pad_value))
-        word_lengths = char_tokens.row_lengths(axis=-1).to_tensor(0)
+        word_lengths = char_tokens.row_lengths(axis=-1).to_tensor(self.pad_len)
         char_ids = self.vocab_chars.lookup(char_tokens.to_tensor(self.pad_value))
 
         features = {
