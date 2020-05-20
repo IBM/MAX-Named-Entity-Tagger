@@ -150,8 +150,13 @@ def _build_model(num_words, num_chars, num_tags, params):
     return model
 
 
-def _get_ckpt_manager(ner_model, ckpt_dir):
-    optimizer = tf.keras.optimizers.Adam()
+def _get_ckpt_manager(params, ner_model, ckpt_dir):
+    if params['learning_rate']:
+        optimizer = tf.keras.optimizers.Adam(learning_rate=params['learning_rate'])
+    else:
+        # default learning rate
+        optimizer = tf.keras.optimizers.Adam()
+    # assume defaults for confidence branch
     conf_optimizer = tf.keras.optimizers.Adam()
     ckpt = (tf.train.Checkpoint(
         epochs_trained=tf.Variable(0),
@@ -170,7 +175,7 @@ def train_confidence_branch(ner_model, params, train_data, valid_data, ckpt_dir)
     y_sig = train_data.element_spec[1]
 
     # restore from checkpoint if exists
-    ckpt, manager = _get_ckpt_manager(ner_model, ckpt_dir)
+    ckpt, manager = _get_ckpt_manager(params, ner_model, ckpt_dir)
     ckpt.restore(manager.latest_checkpoint)
     if manager.latest_checkpoint:
         print('Restored from checkpoint: {}. Epochs trained for confidence branch: {}'.format(
@@ -242,7 +247,7 @@ def train(ner_model, params, train_data, valid_data, ckpt_dir):
     y_sig = train_data.element_spec[1]
 
     # restore from checkpoint if exists
-    ckpt, manager = _get_ckpt_manager(ner_model, ckpt_dir)
+    ckpt, manager = _get_ckpt_manager(params, ner_model, ckpt_dir)
     ckpt.restore(manager.latest_checkpoint)
     if manager.latest_checkpoint:
         print('Restored from checkpoint: {}. Epochs trained: {}'.format(manager.latest_checkpoint, ckpt.epochs_trained.numpy()))
@@ -553,6 +558,7 @@ if __name__ == '__main__':
         help='number of epochs to train confidence branch after training main network (default: 0 i.e. no confidence branch training)')
     model_group.add_argument('--checkpoint_interval', type=int, default=5, help='checkpoint interval in epochs')
     model_group.add_argument('--batch_size', type=int, default=32, help='batch size')
+    model_group.add_argument('--learning_rate', type=float, required=False, help='learning rate for optimizer')
     model_group.add_argument('--buffer', type=int, default=2000, help='buffer for training dataset shuffle')
     model_group.add_argument('--char_lstm_size', type=int, default=64, help='hidden size for char bi-lstm layer')
     model_group.add_argument('--lstm_size', type=int, default=128, help='hidden size for concatenated bi-lstm layer')
