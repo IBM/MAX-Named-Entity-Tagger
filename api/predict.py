@@ -68,7 +68,7 @@ class ModelLabelsAPI(MetadataAPI):
         '''Return the list of labels that can be predicted by the model'''
         result = {}
         result['labels'] = [{'id': l[0], 'name': l[1], 'description': tag_desc[l[1]] if l[1] in tag_desc else ''}
-                            for l in model_wrapper.id_to_tag.items()]
+                            for l in model_wrapper.id_to_tag.items()]  # noqa (E741 ambiguous variable name 'l')
         result['count'] = len(model_wrapper.id_to_tag)
         return result
 
