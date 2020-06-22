@@ -628,6 +628,15 @@ if __name__ == '__main__':
     # train confidence branch
     ner_model = train_confidence_branch(ner_model, params, train_data, valid_data, ckpt_dir)
 
+    # generate entity-level metrics for training data
+    print('Computing multi-class metrics for training data')
+    train_scores = generate_mc_metrics(params, ner_model, train_data)
+    print('Training scores:')
+    print(train_scores)
+    csv_out = str(Path(RESULT_DIR, 'train_scores.csv'))
+    train_scores.to_csv(csv_out, index=False)
+    print('Wrote scores to: {}'.format(csv_out))
+
     # generate entity-level metrics for test data
     print('Computing multi-class metrics for test data')
     test_scores = generate_mc_metrics(params, ner_model, test_data)
