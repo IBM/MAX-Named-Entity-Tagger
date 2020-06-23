@@ -637,6 +637,15 @@ if __name__ == '__main__':
     train_scores.to_csv(csv_out, index=False)
     print('Wrote scores to: {}'.format(csv_out))
 
+    # generate entity-level metrics for validation data
+    print('Computing multi-class metrics for validation data')
+    valid_scores = generate_mc_metrics(params, ner_model, valid_data)
+    print('Validation scores:')
+    print(valid_scores)
+    csv_out = str(Path(RESULT_DIR, 'valid_scores.csv'))
+    valid_scores.to_csv(csv_out, index=False)
+    print('Wrote scores to: {}'.format(csv_out))
+
     # generate entity-level metrics for test data
     print('Computing multi-class metrics for test data')
     test_scores = generate_mc_metrics(params, ner_model, test_data)
