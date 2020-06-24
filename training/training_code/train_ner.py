@@ -629,31 +629,16 @@ if __name__ == '__main__':
     ner_model = train_confidence_branch(ner_model, params, train_data, valid_data, ckpt_dir)
 
     # generate entity-level metrics for training data
-    print('Computing multi-class metrics for training data')
-    train_scores = generate_mc_metrics(params, ner_model, train_data)
-    print('Training scores:')
-    print(train_scores)
-    csv_out = str(Path(RESULT_DIR, 'train_scores.csv'))
-    train_scores.to_csv(csv_out, index=False)
-    print('Wrote scores to: {}'.format(csv_out))
-
-    # generate entity-level metrics for validation data
-    print('Computing multi-class metrics for validation data')
-    valid_scores = generate_mc_metrics(params, ner_model, valid_data)
-    print('Validation scores:')
-    print(valid_scores)
-    csv_out = str(Path(RESULT_DIR, 'valid_scores.csv'))
-    valid_scores.to_csv(csv_out, index=False)
-    print('Wrote scores to: {}'.format(csv_out))
-
-    # generate entity-level metrics for test data
-    print('Computing multi-class metrics for test data')
-    test_scores = generate_mc_metrics(params, ner_model, test_data)
-    print('Test scores:')
-    print(test_scores)
-    csv_out = str(Path(RESULT_DIR, 'test_scores.csv'))
-    test_scores.to_csv(csv_out, index=False)
-    print('Wrote scores to: {}'.format(csv_out))
+    for name, data in (('train', train_data),
+                       ('validation', valid_data),
+                       ('test', test_data)):
+        print(f'Computing multi-class metrics for {name} data')
+        scores = generate_mc_metrics(params, ner_model, train_data)
+        print(f'{name} scores:')
+        print(scores)
+        csv_out = str(Path(RESULT_DIR, f'{name}_scores.csv'))
+        scores.to_csv(csv_out, index=False)
+        print('Wrote scores to: {}'.format(csv_out))
 
     if 'export_dir' in params:
     # export to SavedModel
