@@ -628,7 +628,7 @@ if __name__ == '__main__':
     # train confidence branch
     ner_model = train_confidence_branch(ner_model, params, train_data, valid_data, ckpt_dir)
 
-    # generate entity-level metrics for training data
+    # generate entity-level metrics for all three sets of data
     for name, data in (('train', train_data),
                        ('validation', valid_data),
                        ('test', test_data)):
