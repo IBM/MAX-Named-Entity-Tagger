@@ -633,7 +633,7 @@ if __name__ == '__main__':
                        ('validation', valid_data),
                        ('test', test_data)):
         print(f'Computing multi-class metrics for {name} data')
-        scores = generate_mc_metrics(params, ner_model, train_data)
+        scores = generate_mc_metrics(params, ner_model, data)
         print(f'{name} scores:')
         print(scores)
         csv_out = str(Path(RESULT_DIR, f'{name}_scores.csv'))
