@@ -452,14 +452,17 @@ if __name__ == '__main__':
     # train confidence branch
     ner_model = train_confidence_branch(ner_model, params, train_data, valid_data, ckpt_dir)
 
-    # generate entity-level metrics for test data
-    print('Computing multi-class metrics for test data')
-    test_scores = generate_mc_metrics(params, ner_model, test_data)
-    print('Test scores:')
-    print(test_scores)
-    csv_out = str(Path(RESULT_DIR, 'test_scores.csv'))
-    test_scores.to_csv(csv_out, index=False)
-    print('Wrote scores to: {}'.format(csv_out))
+    # generate entity-level metrics for all three sets of data
+    for name, data in (('train', train_data),
+                       ('validation', valid_data),
+                       ('test', test_data)):
+        print(f'Computing multi-class metrics for {name} data')
+        scores = generate_mc_metrics(params, ner_model, data)
+        print(f'{name} scores:')
+        print(scores)
+        csv_out = str(Path(RESULT_DIR, f'{name}_scores.csv'))
+        scores.to_csv(csv_out, index=False)
+        print('Wrote scores to: {}'.format(csv_out))
 
     if 'export_dir' in params:
     # export to SavedModel
