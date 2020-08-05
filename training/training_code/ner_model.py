@@ -20,7 +20,6 @@ import tensorflow_addons as tfa
 import tensorflow_text as text
 
 
-
 def get_vocab(vocab, num_oov_buckets):
     if isinstance(vocab, str):
         return get_vocab_from_path(vocab, num_oov_buckets)
@@ -44,6 +43,15 @@ def get_vocab_from_path(path, num_oov_buckets):
         tf.string, tf.lookup.TextFileIndex.WHOLE_LINE,
         tf.int64, tf.lookup.TextFileIndex.LINE_NUMBER)
     return _get_vocab(initializer, num_oov_buckets)
+
+
+def reverse_vocab_from_vocab(vocab, default_value='O'):
+    exported_tensors = vocab.export()
+    keys = exported_tensors[1]
+    values = exported_tensors[0]
+    initializer = tf.lookup.KeyValueTensorInitializer(
+        keys, values, key_dtype=keys.dtype, value_dtype=values.dtype)
+    return tf.lookup.StaticHashTable(initializer, default_value)
 
 
 def _get_vocab_from_kv(keys, values, num_oov_buckets):
@@ -130,13 +138,18 @@ def _build_model(num_words, num_chars, num_tags, params):
 
 
 class NERModel(tf.keras.Model):
-    def __init__(self, params, name='ner_model'):
+    def __init__(self, params, vocab_words, vocab_chars, vocab_tags, name='ner_model'):
         super(NERModel, self).__init__(name=name)
 
         self.params = params.copy()
         # load vocab assets
-        self.vocab_words, self.vocab_chars, self.vocab_tags, self.reverse_vocab_tags =\
-            self._load_vocabs(self.params)
+        self.vocab_words = vocab_words
+        self.vocab_chars = vocab_chars
+        self.vocab_tags = vocab_tags
+        self.reverse_vocab_tags = reverse_vocab_from_vocab(vocab_tags)
+
+        # self.vocab_words, self.vocab_chars, self.vocab_tags, self.reverse_vocab_tags =\
+            # self._load_vocabs(self.params)
         self.tokenizer = text.WhitespaceTokenizer()
         # config values
         self.num_words = self.vocab_words.size().numpy()
@@ -151,17 +164,24 @@ class NERModel(tf.keras.Model):
         # build bi-lstm base model
         self.base_model = _build_model(self.num_words, self.num_chars, self.num_tags, self.params)
 
+    def build(self, input_shape):
         # crf model param
         initializer = tf.initializers.GlorotNormal()
-        self.crf_params = tf.Variable(initializer((self.num_tags, self.num_tags)), name='crf_params')
+        self.crf_params = self.add_weight(
+            name='crf_params',
+            shape=(self.num_tags, self.num_tags),
+            initializer=initializer, 
+            trainable=True)
+        
+        #  = tf.Variable(initializer((self.num_tags, self.num_tags)), name='crf_params')
 
-    @staticmethod
-    def _load_vocabs(params):
-        vocab_words = _get_vocab(params['words'], params['num_oov_buckets'])
-        vocab_chars = _get_vocab(params['chars'], params['num_oov_buckets'])
-        vocab_tags = _get_vocab(params['tags'], 0)
-        reverse_vocab_tags = _get_reverse_vocab(params['tags'])
-        return vocab_words, vocab_chars, vocab_tags, reverse_vocab_tags
+    # @staticmethod
+    # def _load_vocabs(params):
+    #     vocab_words = _get_vocab(params['words'], params['num_oov_buckets'])
+    #     vocab_chars = _get_vocab(params['chars'], params['num_oov_buckets'])
+    #     vocab_tags = _get_vocab(params['tags'], 0)
+    #     reverse_vocab_tags = _get_reverse_vocab(params['tags'])
+    #     return vocab_words, vocab_chars, vocab_tags, reverse_vocab_tags
 
     @tf.function(input_signature=[tf.TensorSpec((None,), dtype=tf.string)])
     def serve_text_input(self, words):

@@ -26,7 +26,7 @@ import tensorflow as tf
 import tensorflow_addons as tfa
 import tensorflow_text as text
 
-from ner_model import NERModel
+from ner_model import NERModel, get_vocab_from_path, _get_reverse_vocab
 from metrics import compute_cm, metrics_from_confusion_matrix
 
 
@@ -424,6 +424,7 @@ if __name__ == '__main__':
 
     # write params used for result dir
     with Path(RESULT_DIR, 'params.json').open('w') as f:
+        print('Writing training params to: {}'.format(f.name))
         json.dump(params, f, indent=4, sort_keys=True)
 
     def fwords(name):
@@ -432,19 +433,21 @@ if __name__ == '__main__':
     def ftags(name):
         return str(Path(DATA_DIR, '{}.tags.txt'.format(name)))
 
-    print('Loading vocabs')
-
-
+    print('Loading vocabs.')
+    num_oov_buckets = params['num_oov_buckets']
+    vocab_words = get_vocab_from_path(params['words'], num_oov_buckets)
+    vocab_chars = get_vocab_from_path(params['chars'], num_oov_buckets)
+    vocab_tags = get_vocab_from_path(params['tags'], 0)
     print('Building model.')
-    ner_model = NERModel(params)
+    ner_model = NERModel(params, vocab_words, vocab_chars, vocab_tags)
     # create datasets
     print('Creating datasets.')
     train_data = create_dataset(
-        fwords('train'), ftags('train'), params, ner_model.vocab_words, ner_model.vocab_chars, ner_model.vocab_tags, shuffle=True)
+        fwords('train'), ftags('train'), params, vocab_words, vocab_chars, vocab_tags, shuffle=True)
     valid_data = create_dataset(
-        fwords('valid'), ftags('valid'), params, ner_model.vocab_words, ner_model.vocab_chars, ner_model.vocab_tags)
+        fwords('valid'), ftags('valid'), params, vocab_words, vocab_chars, vocab_tags)
     test_data = create_dataset(
-        fwords('test'), ftags('test'), params, ner_model.vocab_words, ner_model.vocab_chars, ner_model.vocab_tags)
+        fwords('test'), ftags('test'), params, vocab_words, vocab_chars, vocab_tags)
 
     # train model
     ckpt_dir = '{}/ckpts'.format(RESULT_DIR)
@@ -464,8 +467,11 @@ if __name__ == '__main__':
         scores.to_csv(csv_out, index=False)
         print('Wrote scores to: {}'.format(csv_out))
 
+    # export model
     if 'export_dir' in params:
-    # export to SavedModel
+        weights_path = str(Path(RESULT_DIR, 'weights.h5'))
+        print('Exporting NERModel weights to: {}'.format(weights_path))
+        ner_model.save_weights(weights_path, save_format='h5')
         print('Exporting SavedModel to: {}'.format(params['export_dir']))
         tf.saved_model.save(ner_model, params['export_dir'],
             signatures={tf.saved_model.DEFAULT_SERVING_SIGNATURE_DEF_KEY: ner_model.serve_text_input,
