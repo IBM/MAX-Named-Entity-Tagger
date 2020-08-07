@@ -20,7 +20,6 @@ from pathlib import Path
 import sys
 import re
 
-import numpy as np
 import pandas as pd
 import tensorflow as tf
 import tensorflow_addons as tfa

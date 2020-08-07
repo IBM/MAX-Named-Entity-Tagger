@@ -137,6 +137,24 @@ def _build_model(num_words, num_chars, num_tags, params):
     return model
 
 
+class CRFLayer(tf.keras.layers.Layer):
+    def __init__(self, dim, name='crf_layer'):
+        super(CRFLayer, self).__init__(name=name)
+        self.dim = dim
+        initializer = tf.initializers.GlorotNormal()
+        self.crf_params = self.add_weight(
+            name='crf_params',
+            shape=(self.dim, self.dim),
+            initializer=initializer, 
+            trainable=True)
+            
+    def call(self, x):
+        logits = x[0]
+        sent_lengths = x[1]
+        pred_ids, _ = tfa.text.crf.crf_decode(logits, self.crf_params, sent_lengths)
+        return pred_ids
+
+
 class NERModel(tf.keras.Model):
     def __init__(self, params, vocab_words, vocab_chars, vocab_tags, name='ner_model'):
         super(NERModel, self).__init__(name=name)
@@ -163,25 +181,10 @@ class NERModel(tf.keras.Model):
 
         # build bi-lstm base model
         self.base_model = _build_model(self.num_words, self.num_chars, self.num_tags, self.params)
+        self.crf_layer = CRFLayer(self.num_tags)
 
-    def build(self, input_shape):
-        # crf model param
-        initializer = tf.initializers.GlorotNormal()
-        self.crf_params = self.add_weight(
-            name='crf_params',
-            shape=(self.num_tags, self.num_tags),
-            initializer=initializer, 
-            trainable=True)
-        
-        #  = tf.Variable(initializer((self.num_tags, self.num_tags)), name='crf_params')
-
-    # @staticmethod
-    # def _load_vocabs(params):
-    #     vocab_words = _get_vocab(params['words'], params['num_oov_buckets'])
-    #     vocab_chars = _get_vocab(params['chars'], params['num_oov_buckets'])
-    #     vocab_tags = _get_vocab(params['tags'], 0)
-    #     reverse_vocab_tags = _get_reverse_vocab(params['tags'])
-    #     return vocab_words, vocab_chars, vocab_tags, reverse_vocab_tags
+        # initializer = tf.initializers.GlorotNormal()
+        # self.crf_params = tf.Variable(initializer((self.num_tags, self.num_tags)), name='crf_params')
 
     @tf.function(input_signature=[tf.TensorSpec((None,), dtype=tf.string)])
     def serve_text_input(self, words):
@@ -230,20 +233,23 @@ class NERModel(tf.keras.Model):
     def predict_crf(self, x, training):
         sent_lengths = x['sent_lengths']
         logits, _ = self.base_model(x, training)
-        pred_ids, _ = tfa.text.crf.crf_decode(logits, self.crf_params, sent_lengths)
+        # pred_ids, _ = tfa.text.crf.crf_decode(logits, self.crf_params, sent_lengths)
+        pred_ids = self.crf_layer([logits, sent_lengths])
         return logits, pred_ids
 
     @tf.function
     def predict_crf_conf_probs(self, x):
         sent_lengths = x['sent_lengths']
         logits, conf_logits = self(x)
-        pred_ids, _ = tfa.text.crf.crf_decode(logits, self.crf_params, sent_lengths)
+        # pred_ids, _ = tfa.text.crf.crf_decode(logits, self.crf_params, sent_lengths)
+        pred_ids = self.crf_layer([logits, sent_lengths])
         pred_probs = tf.keras.activations.softmax(conf_logits)
         return logits, pred_ids, pred_probs
 
     @tf.function
     def loss(self, y, logits, sent_lengths):
-        log_likelihood, _ = tfa.text.crf.crf_log_likelihood(logits, y, sent_lengths, self.crf_params)
+        # log_likelihood, _ = tfa.text.crf.crf_log_likelihood(logits, y, sent_lengths, self.crf_params)
+        log_likelihood, _ = tfa.text.crf.crf_log_likelihood(logits, y, sent_lengths, self.crf_layer.crf_params)
         return tf.reduce_mean(input_tensor=-log_likelihood)
 
     @tf.function
