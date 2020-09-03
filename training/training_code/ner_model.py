@@ -116,11 +116,13 @@ def _build_model(num_words, num_chars, num_tags, params):
     word_embedding_weights = np.load(glove_file)['embeddings']
     # add an extra vector for the out-of-vocab bucket
     word_embedding_weights = np.vstack([word_embedding_weights, [[0.] * word_embedding_dim]])
-    weight_init = tf.keras.initializers.Constant(word_embedding_weights)
-    word_embeddings = tf.keras.layers.Embedding(num_words, word_embedding_dim,
-                                               embeddings_initializer=weight_init,
+    # weight_init = tf.keras.initializers.Constant(word_embedding_weights)
+    word_emb_layer = tf.keras.layers.Embedding(num_words, word_embedding_dim,
+                                            #    embeddings_initializer=weight_init,
                                                trainable=False,
-                                               name='word_embeddings')(word_ids)
+                                               name='word_embeddings')
+    word_embeddings = word_emb_layer(word_ids)                                           
+    word_emb_layer.set_weights([word_embedding_weights])
 
     embeddings = tf.keras.layers.Concatenate(axis=-1, name='concat_embeddings')([word_embeddings, char_lstm_output])
     embeddings = tf.keras.layers.Dropout(dropout)(embeddings)
