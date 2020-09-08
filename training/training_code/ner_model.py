@@ -116,9 +116,10 @@ def _build_model(num_words, num_chars, num_tags, params):
     word_embedding_weights = np.load(glove_file)['embeddings']
     # add an extra vector for the out-of-vocab bucket
     word_embedding_weights = np.vstack([word_embedding_weights, [[0.] * word_embedding_dim]])
-    # weight_init = tf.keras.initializers.Constant(word_embedding_weights)
+    # For the word embedding layer, rather than using a constant initializer, we init randomly
+    # and then use 'set_weights' to set the weights to the numpy array values.
+    # This is a workaround for a memory issue where the const initializer is written to the saved_model.pb file
     word_emb_layer = tf.keras.layers.Embedding(num_words, word_embedding_dim,
-                                            #    embeddings_initializer=weight_init,
                                                trainable=False,
                                                name='word_embeddings')
     word_embeddings = word_emb_layer(word_ids)                                           
