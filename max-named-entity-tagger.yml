@@ -27,6 +27,6 @@ spec:
     spec:
       containers:
       - name: max-named-entity-tagger
-        image: codait/max-named-entity-tagger:latest
+        image: quay.io/codait/max-named-entity-tagger:latest
         ports:
         - containerPort: 5000
