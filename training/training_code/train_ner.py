@@ -18,14 +18,16 @@ import argparse
 import os
 import numpy as np
 import tensorflow as tf
-from tensorflow.python.keras.layers import Dense, Embedding, Dropout, \
+from tensorflow.keras.layers import Dense, Embedding, Dropout, \
     Bidirectional, LSTM, Lambda, Input, Activation, Masking
-from tensorflow.python.keras.layers import concatenate
-from tensorflow.python.keras.models import Model
-from tensorflow.python.keras.optimizers import Adam
-
+from tensorflow.keras.layers import concatenate
+from tensorflow.keras.models import Model
+from tensorflow.keras.optimizers import Adam
+from tensorflow.keras.callbacks import ModelCheckpoint
+from f1 import F1Score
 from data_utils import load_vocab, write_vocab, get_processing_word, \
     CoNLLDataset, minibatches, pad_sequences
+import shutil
 
 os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 
@@ -81,9 +83,11 @@ dropout = 0.5
 print('Creating training dataset...')
 words, labels = list(minibatches(train, len(train)))[0]  # NOTE: len(train) will return entire dataset!
 char_ids, word_ids = zip(*words)
+
 word_ids, sequence_lengths = pad_sequences(word_ids, pad_tok=pad_tag)
 char_ids, word_lengths = pad_sequences(char_ids, pad_tok=pad_tag, nlevels=2)
 labels, _ = pad_sequences(labels, pad_tok=pad_tag)
+
 
 # Convert word and char ids to np arrays; one-hot encode labels
 char_ids_arr = np.array(char_ids)
@@ -105,9 +109,8 @@ word_ids_arr_valid = np.array(word_ids_valid)
 labels_arr_valid = np.array(labels_valid)
 labels_arr_one_hot_valid = np.eye(n_labels)[labels_arr_valid]
 
+
 # === Model code ===
-
-
 def _build_embeddings(weights, use_bidirectional=False):
     # The first 'branch' of the model embeds words.
     word_emb_input = Input((None, ), name='word_input')
@@ -166,21 +169,45 @@ def _build_model(embedding_weights, char_bidirectional=False, concat_bidirection
 
 # === Build model ===
 
+num_classes = len(labels_arr_one_hot)
+f1 = F1Score(num_classes, average='micro')
+
 model = _build_model(embeddings)
 # Optimizer: Adam shows best results
 adam_op = Adam(lr=lr, decay=lr_decay)
-model.compile(optimizer=adam_op, loss='categorical_crossentropy', metrics=['accuracy'])
+model.compile(optimizer=adam_op, loss='categorical_crossentropy', metrics=['accuracy', f1], experimental_run_tf_function=False)
+
+
+# Remove training output folder before saving the model files of the current run
+shutil.rmtree('training_output', ignore_errors=True)
+
+model_filename = "Epoch-{epoch:02d}"
+checkpoint_path = os.path.join('training_output/checkpoints/', model_filename)
+
+
+callbacks = ModelCheckpoint(filepath=checkpoint_path,
+                            period=1,
+                            verbose=1,
+                            save_weights_only=True,
+                            )
+
+'''
+# Load latest checkpoints and restart training
+latest = tf.train.latest_checkpoint('training_output/checkpoints/')
+print('The latest checkpoint is:', latest)
+model.load_weights(latest)
+'''
 
 # train model
 print('Beginning model fitting...')
-model.fit([word_ids_arr, char_ids_arr], labels_arr_one_hot, batch_size=batch_size, epochs=nepochs,
+model.fit([word_ids_arr, char_ids_arr], labels_arr_one_hot, batch_size=batch_size, callbacks=[callbacks], epochs=nepochs,
           validation_data=([word_ids_arr_valid, char_ids_arr_valid], labels_arr_one_hot_valid))
 
 # Export keras model to TF SavedModel format
 print('Exporting SavedModel to {}'.format(result_dir))
 model.trainable = False
-with tf.keras.backend.get_session() as sess:
-    tf.saved_model.simple_save(
+with tf.compat.v1.keras.backend.get_session() as sess:
+    tf.compat.v1.saved_model.simple_save(
         sess,
         result_dir,
         inputs={t.name: t for t in model.inputs},
