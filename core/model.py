@@ -43,8 +43,8 @@ class ModelWrapper(MAXModelWrapper):
 
         # Loading the tf SavedModel
         self.graph = tf.Graph()
-        self.sess = tf.Session(graph=self.graph)
-        tf.saved_model.loader.load(self.sess, [tag_constants.SERVING], DEFAULT_MODEL_PATH)
+        self.sess = tf.compat.v1.Session(graph=self.graph)
+        tf.compat.v1.saved_model.loader.load(self.sess, [tag_constants.SERVING], DEFAULT_MODEL_PATH)
 
         self.word_ids_tensor = self.sess.graph.get_tensor_by_name('word_input:0')
         self.char_ids_tensor = self.sess.graph.get_tensor_by_name('char_input:0')
