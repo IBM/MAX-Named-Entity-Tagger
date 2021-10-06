@@ -1,2 +1,1 @@
-h5py==2.9.0
-tensorflow==1.15.4
+tensorflow==2.6.0
