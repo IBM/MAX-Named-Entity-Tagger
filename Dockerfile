@@ -17,7 +17,7 @@
 FROM quay.io/codait/max-base:v1.5.2
 
 # Fill in these with a link to the bucket containing the model and the model file name
-ARG model_bucket=https://max-cdn.cdn.appdomain.cloud/max-named-entity-tagger/1.1.0
+ARG model_bucket=https://codait-cos-max.s3.us.cloud-object-storage.appdomain.cloud/max-named-entity-tagger/1.1.0
 ARG model_file=assets.tar.gz
 
 ARG use_pre_trained_model=true
